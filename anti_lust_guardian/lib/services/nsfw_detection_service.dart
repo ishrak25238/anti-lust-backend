@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as img;
 import 'motivational_quotes.dart';
 
 /// NSFW Detection Service that triggers app exit and motivational quotes
@@ -21,7 +20,7 @@ class NSFWDetectionService {
     
     _isMonitoring = true;
     // Check every 5 seconds (adjust based on performance needs)
-    _monitoringTimer = Timer.periodic(Duration(seconds: 5), (_) async {
+    _monitoringTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
       await _checkCurrentScreen();
     });
   }
@@ -52,7 +51,7 @@ class NSFWDetectionService {
         }
       }
     } catch (e) {
-      print("NSFW detection error: $e");
+      // Log error silently in production
     }
   }
 
@@ -63,7 +62,7 @@ class NSFWDetectionService {
       // For now, return null (needs implementation)
       return null;
     } catch (e) {
-      print("Screenshot capture error: $e");
+      // Screenshot capture not available
       return null;
     }
   }
@@ -94,7 +93,7 @@ class NSFWDetectionService {
         'flags': data['flags'] ?? [],
       };
     } catch (e) {
-      print("Backend analysis error: $e");
+      // Backend unavailable, assume safe
       return {'isNSFW': false, 'score': 0.0};
     }
   }
@@ -106,12 +105,12 @@ class NSFWDetectionService {
       await _quotes.speakAndShowQuote();
       
       // 2. Wait for quote to finish
-      await Future.delayed(Duration(seconds: 3));
+      await Future.delayed(const Duration(seconds: 3));
       
       // 3. Exit the app
       await _exitApp();
     } catch (e) {
-      print("NSFW trigger error: $e");
+      // Error triggering NSFW response
     }
   }
 

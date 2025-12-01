@@ -41,7 +41,7 @@ class MotivationalQuotesService {
       await _tts.setPitch(1.0);
       await _tts.speak(quote);
     } catch (e) {
-      print("TTS Error: $e");
+      // TTS not available
     }
   }
 
