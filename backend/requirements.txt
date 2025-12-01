@@ -3,9 +3,9 @@ wheel
 
 # Core FastAPI and Server
 fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
+uvicorn>=0.27.0
 python-dotenv>=1.0.0
-pydantic>=2.5.3
+# pydantic>=2.5.3
 # python-multipart>=0.0.9
 # reportlab>=4.0.8
 
@@ -21,8 +21,8 @@ pydantic>=2.5.3
 # sendgrid>=6.11.0
 
 # Security & Auth
-PyJWT>=2.8.0
-bcrypt>=4.1.2
+# PyJWT>=2.8.0
+# bcrypt>=4.1.2
 # slowapi>=0.1.9
 
 # Monitoring
@@ -30,8 +30,8 @@ bcrypt>=4.1.2
 # sentry-sdk[fastapi]>=1.39.2
 
 # Core Utils
-requests>=2.31.0
-httpx>=0.26.0
+# requests>=2.31.0
+# httpx>=0.26.0
 # pillow>=10.2.0
 # reportlab>=4.0.8
 # twilio>=8.10.0
