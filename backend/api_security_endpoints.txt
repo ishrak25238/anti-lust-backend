@@ -1,0 +1,107 @@
+
+from services.vpn_detection_service import VPNDetectionService
+from services.darkweb_detection_service import DarkWebDetectionService
+
+class SecurityCheckRequest(BaseModel):
+    ip_address: str
+    url: Optional[str] = None
+    user_agent: Optional[str] = None
+    dns_servers: Optional[List[str]] = None
+
+@app.post("/api/security/check-vpn")
+async def check_vpn_status(
+    request: SecurityCheckRequest,
+    api_key: str = Depends(api_key_header)
+):
+    await verify_api_key(api_key)
+    vpn_service = VPNDetectionService()
+    
+    result = await vpn_service.check_ip(request.ip_address)
+    
+    if request.dns_servers:
+        dns_result = vpn_service.detect_dns_leak(request.dns_servers)
+        result['dns_analysis'] = dns_result
+    
+    return result
+
+@app.post("/api/security/check-darkweb")
+async def check_darkweb_activity(
+    request: SecurityCheckRequest,
+    api_key: str = Depends(api_key_header)
+):
+    await verify_api_key(api_key)
+    darkweb_service = DarkWebDetectionService()
+    
+    if request.url and request.user_agent:
+        result = darkweb_service.comprehensive_check(
+            request.url,
+            request.ip_address,
+            request.user_agent
+        )
+    elif request.url:
+        result = darkweb_service.check_url(request.url)
+    else:
+        return {"error": "URL required for dark web check"}
+    
+    if result.get('is_dangerous'):
+        return {
+            "blocked": True,
+            "severity": result.get('severity', 'HIGH'),
+            "details": result,
+            "recommendation": "BLOCK_AND_NOTIFY_PARENT"
+        }
+    
+    return {
+        "blocked": False,
+        "details": result
+    }
+
+@app.post("/api/security/comprehensive-check")
+async def comprehensive_security_check(
+    request: SecurityCheckRequest,
+    api_key: str = Depends(api_key_header)
+):
+    await verify_api_key(api_key)
+    
+    vpn_service = VPNDetectionService()
+    dark_service = DarkWebDetectionService()
+    
+    vpn_result = await vpn_service.check_ip(request.ip_address)
+    
+    dark_result = {}
+    if request.url and request.user_agent:
+        dark_result = dark_service.comprehensive_check(
+            request.url,
+            request.ip_address,
+            request.user_agent
+        )
+    
+    security_score = 100
+    threats_detected = []
+    
+    if vpn_result.get('is_vpn'):
+        security_score -= 50
+        threats_detected.append({
+            'type': 'VPN_DETECTED',
+            'severity': 'HIGH',
+            'confidence': vpn_result.get('confidence', 0),
+            'details': vpn_result
+        })
+    
+    if dark_result.get('is_dangerous'):
+        security_score -= 70
+        threats_detected.append({
+            'type': 'DARK_WEB_ACCESS',
+            'severity': dark_result.get('severity', 'CRITICAL'),
+            'confidence': dark_result.get('overall_confidence', 0),
+            'details': dark_result
+        })
+    
+    return {
+        'security_score': max(0, security_score),
+        'threats_detected': threats_detected,
+        'recommendation': 'BLOCK' if security_score < 50 else 'ALLOW',
+        'vpn_analysis': vpn_result,
+        'darkweb_analysis': dark_result,
+        'timestamp': datetime.utcnow().isoformat()
+    }

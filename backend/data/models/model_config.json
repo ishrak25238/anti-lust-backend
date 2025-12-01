@@ -1,0 +1,12 @@
+{
+  "vision_model": {
+    "name": "Falcons/nsfw_image_detection",
+    "type": "image_classification",
+    "framework": "transformers"
+  },
+  "text_model": {
+    "name": "unitary/toxic-bert",
+    "type": "text_classification",
+    "framework": "transformers"
+  }
+}
