@@ -1,3 +1,0 @@
-# This file redirects to backend/requirements.txt
-# The actual build is handled by build.py (see render.yaml)
--r backend/requirements.txt
