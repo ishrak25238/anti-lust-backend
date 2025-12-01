@@ -9,11 +9,11 @@ import hashlib
 import time
 from datetime import datetime, timedelta
 import jwt
-from passlib.context import CryptContext
+import bcrypt
 
 limiter = Limiter(key_func=get_remote_address)
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
@@ -123,7 +123,9 @@ async def add_security_headers(request: Request, call_next):
     return response
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    # bcrypt.hashpw returns bytes, we need string for DB
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+    # bcrypt.checkpw expects bytes
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
