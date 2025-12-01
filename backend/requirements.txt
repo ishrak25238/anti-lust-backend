@@ -1,5 +1,5 @@
 # Build System
-setuptools<70.0.0
+
 wheel
 
 # Core FastAPI and Server
@@ -21,7 +21,7 @@ aiosmtplib==3.0.1
 sendgrid==6.11.0
 
 # Security & Auth
-python-jose[cryptography]==3.3.0
+PyJWT==2.8.0
 passlib[bcrypt]==1.7.4
 slowapi==0.1.9
 
