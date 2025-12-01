@@ -1,6 +1,7 @@
 """
-Real ML Core - Using NudeNet ONNX Model (640m)
-Best-in-class NSFW detection with 99%+ accuracy
+Real ML Core - Using NudeNet ONNX Model for Images + Keyword-based Text
+Best accuracy for NSFW images, simple keyword matching for text
+NO TensorFlow dependencies = NO conflicts
 """
 import logging
 import numpy as np
@@ -8,6 +9,7 @@ from typing import Optional, Dict, Tuple, Any, List
 from PIL import Image
 import io
 import os
+import re
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("RealMLCore")
@@ -23,7 +25,8 @@ class RealNSFWImageClassifier:
             import onnxruntime as ort
             import cv2
             
-            model_path = os.path.join(os.path.dirname(__file__), '../../data/models/640m.onnx')
+            model_path = os.path.join(os.path.dirname(__file__), '../data/models/640m.onnx')
+            model_path = os.path.abspath(model_path)
             logger.info(f"Loading NudeNet 640m ONNX model from {model_path}...")
             
             # Create ONNX inference session
@@ -109,41 +112,39 @@ class RealNSFWImageClassifier:
             return 0.0
 
 
-class RealTextToxicityClassifier:
+class SimpleTextToxicityClassifier:
     """
-    Real text toxicity classifier using s-nlp/roberta_toxicity_classifier.
-    Pre-trained on Wikipedia Toxic Comments dataset with TensorFlow backend.
+    Simple keyword-based text toxicity classifier.
+    Fast, no external dependencies, works immediately.
     """
     def __init__(self):
-        try:
-            import os
-            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow warnings
-            from transformers import pipeline
-            logger.info("Loading BEST text toxicity classifier (TensorFlow)...")
-            self.classifier = pipeline(
-                "text-classification",
-                model="s-nlp/roberta_toxicity_classifier",
-                framework="tf"
-            )
-            logger.info("[OK] BEST Text Toxicity Classifier loaded (74.3k downloads)")
-        except Exception as e:
-            logger.error(f"Failed to load text classifier: {e}")
-            logger.info("Run: pip install tensorflow transformers")
-            raise
+        # Comprehensive toxic keyword list
+        self.toxic_keywords = {
+            'fuck', 'shit', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'cunt',
+            'dick', 'cock', 'pussy', 'whore', 'slut', 'fag', 'nigger', 'retard',
+            'idiot', 'stupid', 'moron', 'imbecile', 'kill', 'die', 'hate', 'destroy',
+            'porn', 'sex', 'xxx', 'nsfw', 'nude', 'naked', 'explicit', 'hentai'
+        }
+        logger.info(f"[OK] Simple text classifier loaded ({len(self.toxic_keywords)} keywords)")
     
     def predict(self, text: str) -> float:
         """
         Returns toxicity probability (0.0 = safe, 1.0 = toxic)
         """
         try:
-            text = text[:2048]
+            text_lower = text.lower()
             
-            result = self.classifier(text)[0]
+            # Count toxic keywords
+            matches = 0
+            for keyword in self.toxic_keywords:
+                # Use word boundaries to avoid partial matches
+                if re.search(r'\b' + re.escape(keyword) + r'\b', text_lower):
+                    matches += 1
             
-            if result['label'] == 'toxic':
-                return result['score']
-            else:
-                return 1.0 - result['score']
+            # Convert to score (cap at 1.0)
+            score = min(1.0, matches * 0.3)
+            
+            return score
                 
         except Exception as e:
             logger.error(f"Text prediction error: {e}")
@@ -205,9 +206,9 @@ class ModelFactory:
         return ModelFactory._instances['vision']
 
     @staticmethod
-    def get_text_model() -> RealTextToxicityClassifier:
+    def get_text_model() -> SimpleTextToxicityClassifier:
         if 'text' not in ModelFactory._instances:
-            model = RealTextToxicityClassifier()
+            model = SimpleTextToxicityClassifier()
             ModelFactory._instances['text'] = model
         return ModelFactory._instances['text']
 
@@ -215,7 +216,7 @@ class ModelFactory:
 class RealMLCore:
     """
     Main entry point for Real ML operations.
-    Orchestrates Vision, Text, and Audio analysis using pre-trained models.
+    Orchestrates Vision and Text analysis.
     """
     def __init__(self):
         self.vision_model = ModelFactory.get_vision_model()
