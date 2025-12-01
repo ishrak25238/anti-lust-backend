@@ -1,0 +1,41 @@
+name: Build iOS
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Install dependencies
+        working-directory: ./anti_lust_guardian
+        run: flutter pub get
+      
+      - name: Build iOS
+        working-directory: ./anti_lust_guardian
+        run: flutter build ios --release --no-codesign
+      
+      - name: Create IPA
+        working-directory: ./anti_lust_guardian
+        run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r anti-lust-guardian-ios.ipa Payload
+          mv anti-lust-guardian-ios.ipa ../../..
+      
+      - name: Upload iOS Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-build
+          path: anti_lust_guardian/anti-lust-guardian-ios.ipa

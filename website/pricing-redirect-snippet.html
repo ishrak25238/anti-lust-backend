@@ -1,0 +1,69 @@
+\u003c!-- ADD THIS SCRIPT TO index.html AFTER THE STRIPE PRICING TABLE --\u003e
+
+\u003cscript\u003e
+// Intercept Stripe Pricing Table clicks to redirect to login first
+document.addEventListener('DOMContentLoaded', function() {
+// Wait for Stripe pricing table to load
+setTimeout(() => {
+const pricingTable = document.querySelector('stripe-pricing-table');
+
+if (pricingTable) {
+// Override the pricing table click behavior
+pricingTable.addEventListener('click', function(e) {
+// Check if user is authenticated
+if (!window.isAuthenticated || !window.isAuthenticated()) {
+e.preventDefault();
+e.stopPropagation();
+
+// Determine which plan was clicked (you'll need to inspect the button)
+// For now, let's just redirect to login with monthly as default
+const plan = 'monthly'; // You can make this dynamic based on which button was clicked
+
+window.location.href = `/login.html?plan=${plan}`;
+return false;
+}
+}, true);
+}
+}, 1000);
+});
+\u003c/script\u003e
+
+\u003c!-- ALTERNATIVE: Replace Stripe Pricing Table with Custom Buttons --\u003e
+\u003c!--
+\u003cdiv style=\"max-width: 900px; margin: 60px auto; display: grid; grid-template-columns: 1fr 1fr; gap: 30px;\"\u003e
+\u003c!-- Monthly Plan --\u003e
+\u003cdiv style=\"background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 40px; border-radius:
+12px; text-align: center;\"\u003e
+\u003ch3 style=\"color: var(--success); margin-bottom: 20px;\"\u003eMONTHLY SUBSCRIPTION\u003c/h3\u003e
+\u003cdiv style=\"font-size: 48px; font-weight: 900; color: #fff; margin: 20px 0;\"\u003eFREE\u003c/div\u003e
+\u003cp style=\"color: var(--text-muted);\"\u003eFOR 7 DAYS\u003c/p\u003e
+\u003cp style=\"color: var(--success); font-size: 18px; margin: 10px 0;\"\u003eTHEN $10/MONTH\u003c/p\u003e
+\u003cul style=\"text-align: left; margin: 30px 0; list-style: none;\"\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Real-time AI Protection\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Unlimited Devices\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Basic Analytics\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Cancel Anytime\u003c/li\u003e
+\u003c/ul\u003e
+\u003ca href=\"/login.html?plan=monthly\" class=\"btn btn-primary\" style=\"width: 100%; text-decoration: none; display:
+block; padding: 16px;\"\u003eSTART FREE TRIAL\u003c/a\u003e
+\u003c/div\u003e
+
+\u003c!-- Lifetime Plan --\u003e
+\u003cdiv style=\"background: var(--glass-bg); border: 2px solid var(--neon-purple); padding: 40px; border-radius: 12px;
+text-align: center;\"\u003e
+\u003ch3 style=\"color: var(--neon-purple); margin-bottom: 20px;\"\u003eLIFETIME LICENSE\u003c/h3\u003e
+\u003cdiv style=\"font-size: 48px; font-weight: 900; color: #fff; margin: 20px 0;\"\u003e$150\u003c/div\u003e
+\u003cp style=\"color: var(--text-muted);\"\u003eONE-TIME PAYMENT\u003c/p\u003e
+\u003cp style=\"color: var(--neon-purple); font-size: 18px; margin: 10px 0;\"\u003eBEST VALUE\u003c/p\u003e
+\u003cul style=\"text-align: left; margin: 30px 0; list-style: none;\"\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Everything in Monthly\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Priority Processing\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Advanced Analytics\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ Lifetime Updates\u003c/li\u003e
+\u003cli style=\"padding: 8px 0; color: var(--text-muted);\"\u003e✓ VIP Support\u003c/li\u003e
+\u003c/ul\u003e
+\u003ca href=\"/login.html?plan=lifetime\" class=\"btn\" style=\"width: 100%; text-decoration: none; display: block;
+padding: 16px; border-color: var(--neon-purple); color: var(--neon-purple);\"\u003eGET LIFETIME ACCESS\u003c/a\u003e
+\u003c/div\u003e
+\u003c/div\u003e
+--\u003e

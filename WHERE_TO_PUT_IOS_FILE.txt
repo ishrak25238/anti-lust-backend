@@ -1,0 +1,37 @@
+========================================
+   WHERE TO PUT iOS FIREBASE FILE
+========================================
+
+FILE NAME: GoogleService-Info.plist
+
+EXACT LOCATION:
+e:\Anti-Lust app\anti_lust_guardian\ios\Runner\GoogleService-Info.plist
+
+========================================
+
+HOW TO GET THERE IN WINDOWS EXPLORER:
+
+1. Press Windows key + E (opens File Explorer)
+
+2. In the address bar, copy and paste:
+   e:\Anti-Lust app\anti_lust_guardian\ios\Runner
+
+3. Press Enter
+
+4. You should see these files:
+   - AppDelegate.swift
+   - Info.plist
+   - Runner-Bridging-Header.h
+   - (and a few folders)
+
+5. DROP YOUR DOWNLOADED GoogleService-Info.plist HERE!
+
+========================================
+
+QUICK TIP:
+You can also just copy this path and paste it directly 
+into Windows Explorer's address bar:
+
+e:\Anti-Lust app\anti_lust_guardian\ios\Runner
+
+========================================
