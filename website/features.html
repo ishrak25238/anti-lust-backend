@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Anti-Lust Guardian</title>
+    <meta name="description" content="Comprehensive feature breakdown of the Anti-Lust Guardian system">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+
+<body>
+    <canvas id="starfield"></canvas>
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+
+    <header id="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><span>🛡️</span> ANTI-LUST GUARDIAN</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html#features">MODULES</a></li>
+                    <li><a href="features.html">FEATURES</a></li>
+                    <li><a href="index.html#download">DEPLOY</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-small">
+        <div class="container">
+            <h1 class="text-gradient">COMPREHENSIVE FEATURE SET</h1>
+            <p>Military-grade protection powered by advanced AI and behavioral science</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="features-detailed-grid">
+                <!-- ML & AI Features -->
+                <div class="feature-category">
+                    <h2>🧠 ARTIFICIAL INTELLIGENCE ENGINE</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>NSFW Image Detection</h3>
+                            <p><strong>Model:</strong> Falconsai/nsfw_image_detection (Vision Transformer)</p>
+                            <p><strong>Accuracy:</strong> 95%+ on real-world data</p>
+                            <p><strong>Latency:</strong> ~1.5s per image (CPU) | ~300ms (GPU)</p>
+                            <ul>
+                                <li>Pre-trained on 200k+ NSFW images</li>
+                                <li>Real-time classification with confidence scores</li>
+                                <li>Ensemble voting for edge cases</li>
+                                <li>Automatic model updates via HuggingFace</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Text Toxicity Classification</h3>
+                            <p><strong>Model:</strong> RoBERTa Toxicity Classifier</p>
+                            <p><strong>Accuracy:</strong> 95.1% toxic detection | 99.9% safe text</p>
+                            <p><strong>Latency:</strong> ~100-120ms per request</p>
+                            <ul>
+                                <li>Fine-tuned on Wikipedia Toxic Comments dataset</li>
+                                <li>Context-aware multi-label classification</li>
+                                <li>Supports 7 toxicity categories</li>
+                                <li>Keyword database with Bloom filter (46KB)</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>URL Threat Analysis</h3>
+                            <p><strong>Database:</strong> 15,000+ known malicious domains</p>
+                            <p><strong>Detection:</strong> Real-time domain fingerprinting</p>
+                            <ul>
+                                <li>Phishing detection via URL patterns</li>
+                                <li>Dark web domain identification</li>
+                                <li>Proxy/VPN service detection</li>
+                                <li>Automatic blocklist updates</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Behavioral Pattern Analysis</h3>
+                            <p><strong>Algorithm:</strong> Temporal clustering + risk profiling</p>
+                            <ul>
+                                <li>7-day and 30-day pattern windows</li>
+                                <li>Peak hour vulnerability identification</li>
+                                <li>Escalation risk scoring (0-1)</li>
+                                <li>Relapse prediction modeling</li>
+                                <li>Intervention effectiveness tracking</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Features -->
+                <div class="feature-category">
+                    <h2>🔐 SECURITY & PRIVACY</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Enterprise-Grade Encryption</h3>
+                            <ul>
+                                <li>AES-256 encryption for data at rest</li>
+                                <li>TLS 1.3 for data in transit</li>
+                                <li>JWT token-based authentication</li>
+                                <li>API key rotation support</li>
+                                <li>Zero-knowledge architecture</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Device Security</h3>
+                            <ul>
+                                <li>Root/jailbreak detection</li>
+                                <li>Screen capture prevention</li>
+                                <li>Biometric authentication (Face ID/Fingerprint)</li>
+                                <li>Tamper detection</li>
+                                <li>Secure storage for sensitive data</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>VPN Detection (5 Methods)</h3>
+                            <ul>
+                                <li>Private IP range analysis (90% confidence)</li>
+                                <li>IPHub API integration (95% confidence)</li>
+                                <li>Provider fingerprinting (15+ VPN services)</li>
+                                <li>DNS leak detection</li>
+                                <li>Connection timing analysis</li>
+                                <li>24-hour result caching</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Compliance & Audit</h3>
+                            <ul>
+                                <li>COPPA compliant (parental consent)</li>
+                                <li>GDPR data portability (Article 20)</li>
+                                <li>Comprehensive audit logging</li>
+                                <li>Data retention policies (90 days)</li>
+                                <li>Privacy-first design</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Parent Controls -->
+                <div class="feature-category">
+                    <h2>👨‍👩‍👧 PARENTAL CONTROL SYSTEM</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Remote Management</h3>
+                            <ul>
+                                <li>Real-time device locking (duration-based)</li>
+                                <li>App-specific permission control</li>
+                                <li>Screen time limits with schedules</li>
+                                <li>Emergency override system</li>
+                                <li>PIN-protected settings</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Alerts & Notifications</h3>
+                            <ul>
+                                <li>SMS alerts via Twilio</li>
+                                <li>Email notifications (SendGrid/SMTP)</li>
+                                <li>VPN detection alerts (threshold: 3+ detections)</li>
+                                <li>High-severity threat notifications</li>
+                                <li>Daily/weekly summary reports</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Parental Dashboard</h3>
+                            <ul>
+                                <li>Multi-child monitoring</li>
+                                <li>Real-time activity feed</li>
+                                <li>Behavioral analytics</li>
+                                <li>Threat history & trends</li>
+                                <li>Intervention effectiveness metrics</li>
+                                <li>Conversation starters for discussions</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Advanced Insights</h3>
+                            <ul>
+                                <li>Weekly family reports</li>
+                                <li>Comparative analytics (siblings)</li>
+                                <li>Suggested action items</li>
+                                <li>Expert resource recommendations</li>
+                                <li>Progress celebration highlights</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics & Reporting -->
+                <div class="feature-category">
+                    <h2>📊 ANALYTICS & INTELLIGENCE</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Comprehensive Reports</h3>
+                            <ul>
+                                <li>30/60/90-day trend analysis</li>
+                                <li>Overall wellness scoring (0-100)</li>
+                                <li>Threat distribution by type</li>
+                                <li>Temporal pattern analysis (hourly/daily/weekly)</li>
+                                <li>Severity distribution heatmaps</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Predictive Modeling</h3>
+                            <ul>
+                                <li>Weekly risk forecasting</li>
+                                <li>Relapse probability scoring</li>
+                                <li>Confidence intervals (up to 95%)</li>
+                                <li>Risk level classification (low/moderate/high/critical)</li>
+                                <li>Proactive intervention recommendations</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Intervention Analytics</h3>
+                            <ul>
+                                <li>Effectiveness scoring per strategy</li>
+                                <li>Usage frequency tracking</li>
+                                <li>Average threat reduction metrics</li>
+                                <li>Recommended strategy optimization</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Research Export</h3>
+                            <ul>
+                                <li>Anonymized dataset generation</li>
+                                <li>University-ready research papers</li>
+                                <li>JSON/CSV export formats</li>
+                                <li>Metadata preservation</li>
+                                <li>GDPR-compliant data export</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wellness Coach -->
+                <div class="feature-category">
+                    <h2>💬 AI WELLNESS COACH</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Personalized Coaching</h3>
+                            <ul>
+                                <li>Context-aware messaging (time/state-based)</li>
+                                <li>Morning motivation sequences</li>
+                                <li>Evening reflection prompts</li>
+                                <li>Urge detection interventions</li>
+                                <li>Milestone celebration messages</li>
+                                <li>200+ unique message templates</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Intervention Strategies (5 Evidence-Based)</h3>
+                            <ul>
+                                <li>Urge Surfing (85% effective)</li>
+                                <li>Environmental Reset (78% effective)</li>
+                                <li>Cognitive Reframing (82% effective)</li>
+                                <li>Accountability Call (91% effective)</li>
+                                <li>10-Minute Delay Rule (88% effective)</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Daily Missions</h3>
+                            <ul>
+                                <li>Level-adapted challenges</li>
+                                <li>Beginner: Awareness & Environment (10-15 pts)</li>
+                                <li>Intermediate: Practice & Connection (20-25 pts)</li>
+                                <li>Advanced: Mentoring & Reflection (35-50 pts)</li>
+                                <li>24-hour expiration system</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Goal & Progress Tracking</h3>
+                            <ul>
+                                <li>Custom wellness goals</li>
+                                <li>Milestone-based achievements</li>
+                                <li>Progress visualization</li>
+                                <li>Deadline management</li>
+                                <li>Success rate analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gamification -->
+                <div class="feature-category">
+                    <h2>🏆 GAMIFICATION SYSTEM</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Achievement System (25+ Achievements)</h3>
+                            <p><strong>Tiers:</strong> Bronze → Silver → Gold → Platinum → Diamond</p>
+                            <ul>
+                                <li>Streak achievements (1 day → 180 days)</li>
+                                <li>Resistance achievements (1 → 1000 blocks)</li>
+                                <li>Growth achievements (perfect weeks, time-based)</li>
+                                <li>Social achievements (referrals, mentoring)</li>
+                                <li>Mastery achievements (levels, completionist)</li>
+                                <li>Secret achievements for milestone moments</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Leveling System (1-100)</h3>
+                            <ul>
+                                <li>Exponential XP curve (1.15^level)</li>
+                                <li>Points from achievements, challenges, streaks</li>
+                                <li>Level-based feature unlocks</li>
+                                <li>Progress tracking with next-level preview</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Leaderboards</h3>
+                            <ul>
+                                <li>Global rankings</li>
+                                <li>Category-specific boards</li>
+                                <li>Time-based (daily/weekly/monthly/all-time)</li>
+                                <li>Anonymous participation option</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Rewards Catalog</h3>
+                            <ul>
+                                <li>Custom themes (500 pts)</li>
+                                <li>Trophy cabinet (750 pts)</li>
+                                <li>Mentor badge (1000 pts)</li>
+                                <li>Custom motivations (300 pts)</li>
+                                <li>Pro analytics (1500 pts)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Features -->
+                <div class="feature-category">
+                    <h2>⚡ REAL-TIME DASHBOARD</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Live Metrics</h3>
+                            <ul>
+                                <li>WebSocket-based streaming</li>
+                                <li>Device status monitoring</li>
+                                <li>Real-time threat level updates</li>
+                                <li>Screentime tracking</li>
+                                <li>System health indicators</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Instant Alerts</h3>
+                            <ul>
+                                <li>Critical threat notifications</li>
+                                <li>VPN detection warnings</li>
+                                <li>Milestone celebrations</li>
+                                <li>System error reports</li>
+                                <li>Acknowledgment tracking</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Activity Timeline</h3>
+                            <ul>
+                                <li>24-hour event feed</li>
+                                <li>Threat blocks logged</li>
+                                <li>Interventions recorded</li>
+                                <li>Milestones highlighted</li>
+                                <li>Hours-ago relative timestamps</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Performance Monitoring</h3>
+                            <ul>
+                                <li>API metrics (requests/sec, response times)</li>
+                                <li>ML inference latency</li>
+                                <li>Database query performance</li>
+                                <li>System resource usage (CPU/RAM/disk)</li>
+                                <li>Health report generation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Infrastructure -->
+                <div class="feature-category">
+                    <h2>⚙️ TECHNICAL INFRASTRUCTURE</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <h3>Backend Stack</h3>
+                            <ul>
+                                <li>FastAPI (Python 3.11+)</li>
+                                <li>20+ RESTful API endpoints</li>
+                                <li>SQLite database (10 tables)</li>
+                                <li>Async/await architecture</li>
+                                <li>Prometheus metrics export</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Frontend Stack</h3>
+                            <ul>
+                                <li>Flutter 3.0+ (Dart)</li>
+                                <li>Cross-platform (Android/iOS/Windows/macOS/Linux)</li>
+                                <li>118 production dependencies</li>
+                                <li>Cosmic UI theme system</li>
+                                <li>0 compilation errors</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>ML Infrastructure</h3>
+                            <ul>
+                                <li>HuggingFace Transformers integration</li>
+                                <li>TensorFlow + PyTorch support</li>
+                                <li>Model caching system</li>
+                                <li>GPU acceleration ready</li>
+                                <li>Automatic model updates</li>
+                            </ul>
+                        </div>
+
+                        <div class="feature-item">
+                            <h3>Data Storage</h3>
+                            <ul>
+                                <li>90-day event retention</li>
+                                <li>30MB per 1M events</li>
+                                <li>Automatic cleanup policies</li>
+                                <li>Backup & restore support</li>
+                                <li>Export to JSON/CSV</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: linear-gradient(180deg, var(--bg-void), rgba(0, 243, 255, 0.05));">
+        <div class="container">
+            <h2 class="text-gradient text-center">DEPLOYMENT OPTIONS</h2>
+            <div class="deployment-grid">
+                <div class="deployment-option">
+                    <h3>🚀 Self-Hosted</h3>
+                    <ul>
+                        <li>Full control & privacy</li>
+                        <li>No monthly fees</li>
+                        <li>Customizable</li>
+                        <li>Docker support</li>
+                    </ul>
+                </div>
+                <div class="deployment-option">
+                    <h3>☁️ Cloud Deployment</h3>
+                    <ul>
+                        <li>Auto-scaling</li>
+                        <li>Global CDN</li>
+                        <li>99.9% uptime SLA</li>
+                        <li>Managed infrastructure</li>
+                    </ul>
+                </div>
+                <div class="deployment-option">
+                    <h3>🏢 Enterprise</h3>
+                    <ul>
+                        <li>Dedicated servers</li>
+                        <li>SLA guarantees</li>
+                        <li>Priority support</li>
+                        <li>Custom features</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 20px;"><span>🛡️</span> ANTI-LUST
+                        GUARDIAN</a>
+                    <p style="color: var(--text-muted);">Advanced AI protection for the modern digital frontier.
+                        Securing the future, one byte at a time.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>FEATURES</h4>
+                    <ul>
+                        <li><a href="features.html#ml">Neural Engine</a></li>
+                        <li><a href="features.html#security">Security</a></li>
+                        <li><a href="features.html#analytics">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>LEGAL</h4>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">COPPA Compliance</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>SUPPORT</h4>
+                    <ul>
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 ANTI-LUST GUARDIAN // ALL RIGHTS RESERVED ISHRAK ARAF NEO
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>
