@@ -18,10 +18,8 @@ COPY data/models/ /app/data/models/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir onnxruntime==1.16.0 && \
+    pip install --no-cache-dir onnxruntime==1.19.0 && \
     pip install --no-cache-dir opencv-python-headless==4.8.1.78 && \
-    pip install --no-cache-dir tensorflow-cpu==2.15.0 && \
-    pip install --no-cache-dir transformers && \
     pip install --no-cache-dir -r requirements.txt
 
 # Expose port
