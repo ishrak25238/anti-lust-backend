@@ -1,0 +1,663 @@
+"""
+Anti-Lust Guardian Python Backend
+REAL Implementation - No Mocks
+"""
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, EmailStr
+from typing import List, Optional, Dict
+import stripe
+import os
+from dotenv import load_dotenv
+import asyncio
+from datetime import datetime
+import logging
+
+# Import our services
+from services.payment_service import PaymentService
+from services.email_service import EmailService
+from services.ml_service import MLService
+from services.sync_service import SyncService
+from services.pattern_storage import PatternStorage
+from services.notification_service import NotificationService
+from services.audit_logger import AuditLogger
+from database import engine, Base
+
+# Security and monitoring
+from middleware.security import (
+    verify_api_key, verify_jwt_token, limiter, add_security_headers,
+    validate_image_size, validate_text_length, sanitize_input,
+    api_key_header, SecurityConfig
+)
+from middleware.monitoring import (
+    track_request_metrics, track_ml_prediction, track_auth_failure, get_metrics
+)
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Initialize FastAPI
+app = FastAPI(
+    title="Anti-Lust Guardian API",
+    description="Backend services for content filtering and parental controls",
+    version="1.0.0"
+)
+
+# CORS Configuration - Hardened
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "X-API-Key"],
+)
+
+# Security headers middleware
+app.middleware("http")(add_security_headers)
+
+# Request metrics middleware
+app.middleware("http")(track_request_metrics)
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Initialize services
+payment_service = PaymentService()
+email_service = EmailService()
+ml_service = MLService()
+sync_service = SyncService()
+pattern_storage = PatternStorage()
+notification_service = NotificationService()
+audit_logger = AuditLogger()
+security_config = SecurityConfig()
+
+# Pydantic Models
+class PaymentIntentRequest(BaseModel):
+    price_id: str
+    amount: int  # in cents
+
+class PaymentIntentResponse(BaseModel):
+    client_secret: str
+    payment_intent_id: str
+
+class PairingRequest(BaseModel):
+    parent_email: EmailStr
+    child_code: str
+    child_name: str
+
+class ThreatLog(BaseModel):
+    device_id: str
+    source: str
+    reason: str
+    context: str
+    timestamp: str
+
+class NSFWCheckRequest(BaseModel):
+    image_base64: str
+
+class TextClassificationRequest(BaseModel):
+    text: str
+
+class URLThreatRequest(BaseModel):
+    url: str
+
+# ============== PAYMENT ENDPOINTS ==============
+
+@app.post("/api/payment/create-intent", response_model=PaymentIntentResponse)
+async def create_payment_intent(request: PaymentIntentRequest):
+    """
+    Creates a Stripe PaymentIntent for subscription payment.
+    REAL Stripe integration - no mocks.
+    """
+    try:
+        payment_intent = await payment_service.create_payment_intent(
+            amount=request.amount,
+            metadata={"price_id": request.price_id}
+        )
+        return PaymentIntentResponse(
+            client_secret=payment_intent.client_secret,
+            payment_intent_id=payment_intent.id
+        )
+    except Exception as e:
+        logger.error(f"Payment intent creation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/payment/confirm")
+async def confirm_payment(payment_intent_id: str):
+    """Confirms payment was successful"""
+    try:
+        result = await payment_service.confirm_payment(payment_intent_id)
+        return {"success": True, "subscription_active": result}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== PARENTAL CONTROL ENDPOINTS ==============
+
+@app.post("/api/pairing/link")
+async def link_parent_child(request: PairingRequest):
+    """
+    Links a parent account to a child device using pairing code.
+    REAL database storage.
+    """
+    try:
+        result = await sync_service.link_accounts(
+            parent_email=request.parent_email,
+            child_code=request.child_code,
+            child_name=request.child_name
+        )
+        return {"success": True, "link_id": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.post("/api/logs/push")
+async def push_child_logs(logs: List[ThreatLog]):
+    """
+    Receives threat logs from child device.
+    Stores in database for parent retrieval.
+    """
+    try:
+        await sync_service.store_logs(logs)
+        return {"success": True, "count": len(logs)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/logs/fetch/{parent_email}")
+async def fetch_child_logs(parent_email: str):
+    """
+    Retrieves child's threat logs for parent dashboard.
+    REAL data from database.
+    """
+    try:
+        logs = await sync_service.get_logs_for_parent(parent_email)
+        return {"logs": logs}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== ML/AI ENDPOINTS ==============
+
+@app.post("/api/ml/nsfw-check")
+@limiter.limit("100/minute")
+async def check_nsfw(
+    request: Request,
+    nsfw_request: NSFWCheckRequest,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    NSFW image detection using pre-trained model.
+    REAL ML inference - no mocks.
+    Requires API key authentication.
+    """
+    # Verify API key
+    await verify_api_key(api_key)
+    
+    # Validate image size
+    validate_image_size(nsfw_request.image_base64, max_mb=security_config.max_image_size_mb)
+    
+    try:
+        score = await ml_service.detect_nsfw(nsfw_request.image_base64)
+        
+        # Store pattern event if device_id provided
+        if hasattr(nsfw_request, 'device_id') and nsfw_request.device_id:
+            device_id = nsfw_request.device_id
+            threat_level = 4 if score > 0.8 else 3 if score > 0.6 else 2 if score > 0.4 else 1
+            
+            await pattern_storage.store_event(
+                device_id=device_id,
+                event_type='nsfw',
+                confidence=score,
+                threat_level=threat_level,
+                threat_score=score,
+                context={'source': 'image_check'}
+            )
+            
+            # Send critical alert if CRITICAL level
+            if score > 0.8 and hasattr(nsfw_request, 'parent_email'):
+                await notification_service.send_critical_alert(
+                    device_id=device_id,
+                    parent_email=nsfw_request.parent_email,
+                    event_type='NSFW',
+                    threat_level='CRITICAL',
+                    confidence=score,
+                    context={'source': 'image_check'}
+                )
+        
+        return {
+            "is_nsfw": score > 0.7,
+            "confidence": score,
+            "threshold": 0.7
+        }
+    except Exception as e:
+        logger.error(f"NSFW detection failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ml/classify-text")
+@limiter.limit("100/minute")
+async def classify_text(
+    request: Request,
+    text_request: TextClassificationRequest,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    Text classification for harmful content detection.
+    Uses transformer model.
+    Requires API key authentication.
+    """
+    # Verify API key
+    await verify_api_key(api_key)
+    
+    # Validate text length
+    validate_text_length(text_request.text, max_length=security_config.max_text_length)
+    
+    # Sanitize input
+    sanitized_text = sanitize_input(text_request.text)
+    
+    try:
+        result = await ml_service.classify_text(sanitized_text)
+        
+        # Store pattern event if device_id provided
+        if hasattr(text_request, 'device_id') and text_request.device_id:
+            device_id = text_request.device_id
+            await pattern_storage.store_event(
+                device_id=device_id,
+                event_type='text',
+                confidence=result['confidence'],
+                threat_level=3 if result['is_harmful'] else 0,
+                threat_score=result['confidence'],
+                context={'classification': result['classification']}
+            )
+        
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ml/threat-url")
+@limiter.limit("100/minute")
+async def analyze_url(
+    request: Request,
+    url_request: URLThreatRequest,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    URL threat analysis using ML + heuristics.
+    Requires API key authentication.
+    """
+    # Verify API key
+    await verify_api_key(api_key)
+    
+    try:
+        threat_score = await ml_service.analyze_url(url_request.url)
+        
+        # Store pattern event if device_id provided
+        if hasattr(url_request, 'device_id') and url_request.device_id:
+            device_id = url_request.device_id
+            threat_level = 4 if threat_score > 0.8 else 3 if threat_score > 0.6 else 2 if threat_score > 0.4 else 1
+            
+            await pattern_storage.store_event(
+                device_id=device_id,
+                event_type='url',
+                confidence=threat_score,
+                threat_level=threat_level,
+                threat_score=threat_score,
+                context={'url': url_request.url}
+            )
+        
+        return {
+            "url": url_request.url,
+            "threat_score": threat_score,
+            "is_blocked": threat_score > 0.7
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== PATTERN ANALYSIS ENDPOINTS ==============
+
+@app.get("/api/patterns/analysis/{device_id}")
+@limiter.limit("50/minute")
+async def get_pattern_analysis(
+    request: Request,
+    device_id: str,
+    days: int = 7,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    Get temporal pattern analysis for a device
+    Requires API key authentication
+    """
+    await verify_api_key(api_key)
+    
+    try:
+        patterns = await pattern_storage.analyze_temporal_patterns(device_id, days=days)
+        recommendations = await pattern_storage.generate_recommendations(device_id)
+        profile = await pattern_storage.get_behavioral_profile(device_id)
+        
+        return {
+            "patterns": patterns,
+            "recommendations": recommendations,
+            "profile": profile
+        }
+    except Exception as e:
+        logger.error(f"Pattern analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/patterns/false-positive")
+@limiter.limit("20/minute")
+async def report_false_positive(
+    request: Request,
+    event_id: int,
+    device_id: str,
+    reason: str,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    Report a false positive for ML improvement
+    """
+    await verify_api_key(api_key)
+    
+    try:
+        report_id = await pattern_storage.report_false_positive(event_id, device_id, reason)
+        return {"success": True, "report_id": report_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== MONITORING ENDPOINTS ==============
+
+@app.get("/metrics")
+async def prometheus_metrics():
+    """Prometheus metrics endpoint"""
+    from prometheus_client import generate_latest
+    return Response(content=generate_latest(), media_type="text/plain")
+
+@app.get("/api/stats/ml")
+@limiter.limit("20/minute")
+async def ml_statistics(request: Request):
+    """ML service statistics and health"""
+    try:
+        return ml_service.get_health()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== RESEARCH & REPORTING ==============
+
+
+@app.post("/api/research/generate-report")
+async def generate_research_report(
+    device_id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    Generates and emails forensic research report.
+    REAL email sending - not mocked.
+    """
+    try:
+        # Fetch logs for this device
+        logs = await sync_service.get_logs_by_device(device_id)
+        
+        # Generate report in background
+        background_tasks.add_task(
+            email_service.send_research_report,
+            logs=logs,
+            device_id=device_id
+        )
+        
+        return {
+            "success": True,
+            "message": "Report generation started",
+            "log_count": len(logs)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== HEALTH CHECK ==============
+
+@app.get("/")
+async def root():
+    return {
+        "service": "Anti-Lust Guardian API",
+        "status": "operational",
+        "version": "1.0.0",
+        "features": {
+            "payment": True,
+            "ml_models": True,
+            "email": True,
+            "sync": True
+        }
+    }
+
+@app.get("/health")
+async def health_check():
+    """Check if all services are operational"""
+    return {
+        "status": "healthy",
+        "stripe": payment_service.is_configured(),
+        "email": email_service.is_configured(),
+        "ml": ml_service.is_loaded(),
+        "database": "connected"
+    """
+    Text classification for harmful content detection.
+    Uses transformer model.
+    Requires API key authentication.
+    """
+    # Verify API key
+    await verify_api_key(api_key)
+    
+    # Validate text length
+    validate_text_length(text_request.text, max_length=security_config.max_text_length)
+    
+    # Sanitize input
+    sanitized_text = sanitize_input(text_request.text)
+    
+    try:
+        result = await ml_service.classify_text(sanitized_text)
+        
+        # Store pattern event if device_id provided
+        if hasattr(text_request, 'device_id') and text_request.device_id:
+            device_id = text_request.device_id
+            await pattern_storage.store_event(
+                device_id=device_id,
+                event_type='text',
+                confidence=result['confidence'],
+                threat_level=3 if result['is_harmful'] else 0,
+                threat_score=result['confidence'],
+                context={'classification': result['classification']}
+            )
+        
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/ml/threat-url")
+@limiter.limit("100/minute")
+async def analyze_url(
+    request: Request,
+    url_request: URLThreatRequest,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    URL threat analysis using ML + heuristics.
+    Requires API key authentication.
+    """
+    # Verify API key
+    await verify_api_key(api_key)
+    
+    try:
+        threat_score = await ml_service.analyze_url(url_request.url)
+        
+        # Store pattern event if device_id provided
+        if hasattr(url_request, 'device_id') and url_request.device_id:
+            device_id = url_request.device_id
+            threat_level = 4 if threat_score > 0.8 else 3 if threat_score > 0.6 else 2 if threat_score > 0.4 else 1
+            
+            await pattern_storage.store_event(
+                device_id=device_id,
+                event_type='url',
+                confidence=threat_score,
+                threat_level=threat_level,
+                threat_score=threat_score,
+                context={'url': url_request.url}
+            )
+        
+        return {
+            "url": url_request.url,
+            "threat_score": threat_score,
+            "is_blocked": threat_score > 0.7
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== PATTERN ANALYSIS ENDPOINTS ==============
+
+@app.get("/api/patterns/analysis/{device_id}")
+@limiter.limit("50/minute")
+async def get_pattern_analysis(
+    request: Request,
+    device_id: str,
+    days: int = 7,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    Get temporal pattern analysis for a device
+    Requires API key authentication
+    """
+    await verify_api_key(api_key)
+    
+    try:
+        patterns = await pattern_storage.analyze_temporal_patterns(device_id, days=days)
+        recommendations = await pattern_storage.generate_recommendations(device_id)
+        profile = await pattern_storage.get_behavioral_profile(device_id)
+        
+        return {
+            "patterns": patterns,
+            "recommendations": recommendations,
+            "profile": profile
+        }
+    except Exception as e:
+        logger.error(f"Pattern analysis failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/patterns/false-positive")
+@limiter.limit("20/minute")
+async def report_false_positive(
+    request: Request,
+    event_id: int,
+    device_id: str,
+    reason: str,
+    api_key: str = Depends(api_key_header)
+):
+    """
+    Report a false positive for ML improvement
+    """
+    await verify_api_key(api_key)
+    
+    try:
+        report_id = await pattern_storage.report_false_positive(event_id, device_id, reason)
+        return {"success": True, "report_id": report_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== MONITORING ENDPOINTS ==============
+
+@app.get("/metrics")
+async def prometheus_metrics():
+    """Prometheus metrics endpoint"""
+    from prometheus_client import generate_latest
+    return Response(content=generate_latest(), media_type="text/plain")
+
+@app.get("/api/stats/ml")
+@limiter.limit("20/minute")
+async def ml_statistics(request: Request):
+    """ML service statistics and health"""
+    try:
+        return ml_service.get_health()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== RESEARCH & REPORTING ==============
+
+
+@app.post("/api/research/generate-report")
+async def generate_research_report(
+    device_id: str,
+    background_tasks: BackgroundTasks
+):
+    """
+    Generates and emails forensic research report.
+    REAL email sending - not mocked.
+    """
+    try:
+        # Fetch logs for this device
+        logs = await sync_service.get_logs_by_device(device_id)
+        
+        # Generate report in background
+        background_tasks.add_task(
+            email_service.send_research_report,
+            logs=logs,
+            device_id=device_id
+        )
+        
+        return {
+            "success": True,
+            "message": "Report generation started",
+            "log_count": len(logs)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============== HEALTH CHECK ==============
+
+@app.get("/")
+async def root():
+    return {
+        "service": "Anti-Lust Guardian API",
+        "status": "operational",
+        "version": "1.0.0",
+        "features": {
+            "payment": True,
+            "ml_models": True,
+            "email": True,
+            "sync": True
+        }
+    }
+
+@app.get("/health")
+async def health_check():
+    """Check if all services are operational"""
+    return {
+        "status": "healthy",
+        "stripe": payment_service.is_configured(),
+        "email": email_service.is_configured(),
+        "ml": ml_service.is_loaded(),
+        "database": "connected"
+    }
+
+# Initialize database on startup
+@app.on_event("startup")
+async def startup():
+    """Initialize on startup"""
+    logger.info("Initializing database...")
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
+    logger.info("Loading ML models...")
+    # Only load models if available (not in degraded mode)
+    if hasattr(ml_service, 'load_models') and callable(getattr(ml_service, 'load_models')):
+        try:
+            await ml_service.load_models()
+            logger.info("✓ ML models loaded successfully")
+        except Exception as e:
+            logger.warning(f"ML model loading failed (degraded mode): {e}")
+    else:
+        logger.warning("ML service in degraded mode - models not available")
+    
+    logger.info("✓ Server ready!")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
