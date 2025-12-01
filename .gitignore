@@ -6,6 +6,8 @@
 # Database
 *.db
 *.sqlite*
+database.db
+database.db-journal
 
 # Python
 __pycache__/
@@ -17,12 +19,16 @@ __pycache__/
 venv/
 ENV/
 env/
+*.egg-info/
+dist/
+build/
 
 # Models (too large for git)
 models/*.pt
 models/*.pth
 models/*.safetensors
 *.onnx
+ml_cache/
 
 # Logs
 *.log
@@ -51,3 +57,6 @@ htmlcov/
 .coverage
 .coverage.*
 .pytest_cache/
+
+# Node
+node_modules/

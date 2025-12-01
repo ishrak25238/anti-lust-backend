@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - Anti-Lust Guardian</title>
+    <meta name="description" content="Complete API documentation for Anti-Lust Guardian integration">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .api-section {
+            background: var(--card-background);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .endpoint {
+            background: rgba(0, 243, 255, 0.05);
+            border-left: 3px solid var(--neon-cyan);
+            padding: var(--spacing-md);
+            margin: var(--spacing-sm) 0;
+            border-radius: 4px;
+        }
+
+        .method {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-right: var(--spacing-sm);
+        }
+
+        .method.get {
+            background: #00FF88;
+            color: #000;
+        }
+
+        .method.post {
+            background: #00F3FF;
+            color: #000;
+        }
+
+        .method.put {
+            background: #FFB800;
+            color: #000;
+        }
+
+        .method.delete {
+            background: #FF2A6D;
+            color: #fff;
+        }
+
+        .code-block {
+            background: #000;
+            color: #00FF88;
+            padding: var(--spacing-md);
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .param-table th,
+        .param-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .param-table th {
+            color: var(--neon-cyan);
+            font-weight: 700;
+        }
+
+        .required {
+            color: var(--danger);
+            font-weight: 700;
+        }
+
+        .optional {
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="starfield"></canvas>
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+
+    <header id="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo"><span>🛡️</span> ANTI-LUST GUARDIAN</a>
+            <nav>
+                <ul>
+                    <li><a href="index.html#features">MODULES</a></li>
+                    <li><a href="features.html">FEATURES</a></li>
+                    <li><a href="api-docs.html">API DOCS</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-small">
+        <div class="container">
+            <h1 class="text-gradient">API DOCUMENTATION</h1>
+            <p>RESTful API reference for backend integration</p>
+            <div style="margin-top: 20px;">
+                <span class="badge">Version 4.2.0</span>
+                <span class="badge" style="margin-left: 10px;">Base URL: http://localhost:8000/api</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <!-- Authentication -->
+            <div class="api-section">
+                <h2>🔐 AUTHENTICATION</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">
+                    All API requests require authentication via JWT tokens or API keys.
+                </p>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/auth/register</code></p>
+                    <p style="color: var(--text-muted);">Register a new user account</p>
+
+                    <h4 style="margin-top: 15px;">Request Body:</h4>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>email</td>
+                            <td>string</td>
+                            <td><span class="required">Yes</span></td>
+                            <td>User email address</td>
+                        </tr>
+                        <tr>
+                            <td>password</td>
+                            <td>string</td>
+                            <td><span class="required">Yes</span></td>
+                            <td>User password (min 8 chars)</td>
+                        </tr>
+                        <tr>
+                            <td>role</td>
+                            <td>enum</td>
+                            <td><span class="required">Yes</span></td>
+                            <td>User role: "parent" | "child"</td>
+                        </tr>
+                    </table>
+
+                    <h4>Example Request:</h4>
+                    <div class="code-block">
+                        {
+                        "email": "parent@example.com",
+                        "password": "SecurePass123!",
+                        "role": "parent"
+                        }
+                    </div>
+
+                    <h4>Response (200 OK):</h4>
+                    <div class="code-block">
+                        {
+                        "id": 1,
+                        "email": "parent@example.com",
+                        "role": "parent",
+                        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                        "token_type": "bearer"
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/auth/login</code></p>
+                    <p style="color: var(--text-muted);">Authenticate and obtain access token</p>
+
+                    <div class="code-block">
+                        {
+                        "email": "parent@example.com",
+                        "password": "SecurePass123!"
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Services -->
+            <div class="api-section">
+                <h2>🧠 ML DETECTION SERVICES</h2>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/ml/scan-image</code></p>
+                    <p style="color: var(--text-muted);">Scan image for NSFW content</p>
+
+                    <h4>Request Body:</h4>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>image_base64</td>
+                            <td>string</td>
+                            <td><span class="required">Yes</span></td>
+                            <td>Base64 encoded image data</td>
+                        </tr>
+                        <tr>
+                            <td>user_id</td>
+                            <td>integer</td>
+                            <td><span class="required">Yes</span></td>
+                            <td>User ID for context</td>
+                        </tr>
+                    </table>
+
+                    <h4>Response:</h4>
+                    <div class="code-block">
+                        {
+                        "is_nsfw": true,
+                        "confidence": 0.95,
+                        "threat_level": 4,
+                        "model_version": "Falconsai/nsfw_image_detection",
+                        "timestamp": "2025-11-28T16:30:00Z"
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/ml/scan-text</code></p>
+                    <p style="color: var(--text-muted);">Analyze text for toxic/inappropriate content</p>
+
+                    <h4>Request Body:</h4>
+                    <div class="code-block">
+                        {
+                        "text": "Sample text to analyze",
+                        "user_id": 1
+                        }
+                    </div>
+
+                    <h4>Response:</h4>
+                    <div class="code-block">
+                        {
+                        "is_toxic": false,
+                        "toxicity_score": 0.05,
+                        "categories": {
+                        "toxic": 0.05,
+                        "severe_toxic": 0.01,
+                        "obscene": 0.02,
+                        "threat": 0.00,
+                        "insult": 0.03,
+                        "identity_hate": 0.00
+                        },
+                        "model_version": "s-nlp/roberta_toxicity_classifier"
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/ml/scan-url</code></p>
+                    <p style="color: var(--text-muted);">Check URL threat level</p>
+
+                    <div class="code-block">
+                        // Request
+                        {
+                        "url": "https://example.com",
+                        "user_id": 1
+                        }
+
+                        // Response
+                        {
+                        "is_safe": true,
+                        "threat_score": 0.12,
+                        "domain_flagged": false,
+                        "category": "general",
+                        "recommendations": "Allow with monitoring"
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parent Controls -->
+            <div class="api-section">
+                <h2>👨‍👩‍👧 PARENT CONTROLS</h2>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/parent/link-child</code></p>
+                    <p style="color: var(--text-muted);">Link a child device to parent account</p>
+
+                    <div class="code-block">
+                        {
+                        "parent_id": 1,
+                        "child_email": "child@example.com",
+                        "permissions": {
+                        "can_uninstall": false,
+                        "screentime_limit_hours": 3,
+                        "auto_lock_enabled": true
+                        }
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/parent/lock-device</code></p>
+                    <p style="color: var(--text-muted);">Remotely lock child's device</p>
+
+                    <div class="code-block">
+                        {
+                        "child_id": 5,
+                        "duration_minutes": 60,
+                        "reason": "Study time",
+                        "allow_emergency": true
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/parent/activity/{child_id}</code></p>
+                    <p style="color: var(--text-muted);">View child activity feed</p>
+
+                    <h4>Query Parameters:</h4>
+                    <table class="param-table">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>days</td>
+                            <td>integer</td>
+                            <td>Number of days to retrieve (default: 7)</td>
+                        </tr>
+                        <tr>
+                            <td>severity_min</td>
+                            <td>integer</td>
+                            <td>Minimum threat level (0-5)</td>
+                        </tr>
+                    </table>
+
+                    <h4>Response:</h4>
+                    <div class="code-block">
+                        {
+                        "child_id": 5,
+                        "activity_count": 127,
+                        "events": [
+                        {
+                        "timestamp": "2025-11-28T14:20:00Z",
+                        "event_type": "url_blocked",
+                        "threat_level": 4,
+                        "description": "Blocked inappropriate website",
+                        "url": "example-blocked.com"
+                        },
+                        {
+                        "timestamp": "2025-11-28T10:15:00Z",
+                        "event_type": "screentime_warning",
+                        "description": "2 hours of screentime today"
+                        }
+                        ]
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics -->
+            <div class="api-section">
+                <h2>📊 ANALYTICS & REPORTING</h2>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/analytics/comprehensive/{device_id}</code></p>
+                    <p style="color: var(--text-muted);">Generate comprehensive analytics report</p>
+
+                    <h4>Response (Truncated):</h4>
+                    <div class="code-block">
+                        {
+                        "device_id": "device_123",
+                        "report_period": "30 days",
+                        "overall_score": 78.5,
+                        "metrics": [
+                        {
+                        "metric_name": "average_threat_score",
+                        "value": 0.15,
+                        "trend": "improving",
+                        "percentile": 0.75
+                        },
+                        {
+                        "metric_name": "clean_streak_days",
+                        "value": 18,
+                        "trend": "improving",
+                        "percentile": 0.80
+                        }
+                        ],
+                        "insights": [
+                        "Threat levels decreased 45% over past 14 days",
+                        "Peak vulnerability detected at 10 PM"
+                        ],
+                        "recommendations": [
+                        {
+                        "priority": "high",
+                        "action": "Set device curfew at 9 PM"
+                        }
+                        ]
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/analytics/prediction/{device_id}</code></p>
+                    <p style="color: var(--text-muted);">Get predictive risk model</p>
+
+                    <div class="code-block">
+                        {
+                        "status": "generated",
+                        "predicted_score": 0.25,
+                        "confidence": 0.88,
+                        "risk_level": "moderate",
+                        "trend_direction": "decreasing",
+                        "recommendation": "Continue current interventions"
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gamification -->
+            <div class="api-section">
+                <h2>🏆 GAMIFICATION</h2>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/gamification/achievements/{user_id}</code></p>
+                    <p style="color: var(--text-muted);">List all achievements and unlock status</p>
+
+                    <div class="code-block">
+                        {
+                        "total_unlocked": 12,
+                        "total_points": 1250,
+                        "level": 15,
+                        "achievements": [
+                        {
+                        "achievement_id": "week_one",
+                        "title": "Seven Days Strong",
+                        "unlocked": true,
+                        "unlock_date": "2025-11-20T10:00:00Z",
+                        "points": 50
+                        }
+                        ]
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/gamification/leaderboard</code></p>
+                    <p style="color: var(--text-muted);">View global leaderboard</p>
+
+                    <h4>Query Parameters:</h4>
+                    <ul style="color: var(--text-muted);">
+                        <li>category: "global" | "weekly" | "monthly"</li>
+                        <li>limit: integer (default: 10)</li>
+                    </ul>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method post">POST</span> <code>/gamification/redeem-reward</code></p>
+                    <p style="color: var(--text-muted);">Redeem points for rewards</p>
+
+                    <div class="code-block">
+                        {
+                        "user_id": 1,
+                        "reward_id": "custom_theme_1",
+                        "confirm": true
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Dashboard -->
+            <div class="api-section">
+                <h2>⚡ REAL-TIME DASHBOARD</h2>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/dashboard/live/{device_id}</code></p>
+                    <p style="color: var(--text-muted);">Get live metrics snapshot</p>
+
+                    <div class="code-block">
+                        {
+                        "device_status": {
+                        "online": true,
+                        "battery_level": 78,
+                        "last_seen": "2025-11-28T16:45:00Z"
+                        },
+                        "protection_status": {
+                        "active_filters": 5,
+                        "threats_blocked_today": 3,
+                        "vpn_detected": false
+                        },
+                        "behavioral_metrics": {
+                        "current_threat_level": 0.15,
+                        "streak_days": 5,
+                        "screentime_today_minutes": 142
+                        }
+                        }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <p><span class="method get">GET</span> <code>/dashboard/heatmap/{device_id}</code></p>
+                    <p style="color: var(--text-muted);">Get hourly activity heatmap data</p>
+
+                    <div class="code-block">
+                        {
+                        "hourly_activity": {
+                        "0": 0.05,
+                        "1": 0.02,
+                        ...
+                        "22": 0.82,
+                        "23": 0.65
+                        },
+                        "hotspots": [
+                        {
+                        "hour": 22,
+                        "intensity": 0.82,
+                        "recommendation": "Consider monitoring at 22:00"
+                        }
+                        ]
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Codes -->
+            <div class="api-section">
+                <h2>⚠️ ERROR CODES</h2>
+                <table class="param-table">
+                    <tr>
+                        <th>Code</th>
+                        <th>Message</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>400</td>
+                        <td>Bad Request</td>
+                        <td>Invalid request parameters or format</td>
+                    </tr>
+                    <tr>
+                        <td>401</td>
+                        <td>Unauthorized</td>
+                        <td>Missing or invalid authentication token</td>
+                    </tr>
+                    <tr>
+                        <td>403</td>
+                        <td>Forbidden</td>
+                        <td>Insufficient permissions for resource</td>
+                    </tr>
+                    <tr>
+                        <td>404</td>
+                        <td>Not Found</td>
+                        <td>Resource does not exist</td>
+                    </tr>
+                    <tr>
+                        <td>429</td>
+                        <td>Too Many Requests</td>
+                        <td>Rate limit exceeded (100 req/min)</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>Internal Server Error</td>
+                        <td>Server error, retry after delay</td>
+                    </tr>
+                    <tr>
+                        <td>503</td>
+                        <td>Service Unavailable</td>
+                        <td>ML models loading or system maintenance</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Rate Limiting -->
+            <div class="api-section">
+                <h2>⏱️ RATE LIMITING</h2>
+                <p style="color: var(--text-muted);">
+                    The API enforces rate limits to ensure fair usage:
+                </p>
+                <ul style="color: var(--text-muted); margin-left: 20px;">
+                    <li><strong>Standard tier:</strong> 100 requests per minute</li>
+                    <li><strong>Premium tier:</strong> 500 requests per minute</li>
+                    <li><strong>ML endpoints:</strong> 50 requests per minute (resource-intensive)</li>
+                </ul>
+
+                <h4 style="margin-top: 20px;">Rate Limit Headers:</h4>
+                <div class="code-block">
+                    X-RateLimit-Limit: 100
+                    X-RateLimit-Remaining: 95
+                    X-RateLimit-Reset: 1732829400
+                </div>
+            </div>
+
+            <!-- Webhooks -->
+            <div class="api-section">
+                <h2>🔔 WEBHOOKS</h2>
+                <p style="color: var(--text-muted);">
+                    Configure webhooks to receive real-time event notifications:
+                </p>
+
+                <h4>Supported Events:</h4>
+                <ul style="color: var(--text-muted); margin-left: 20px;">
+                    <li><code>threat.detected</code> - High-severity threat blocked</li>
+                    <li><code>vpn.detected</code> - VPN usage detected (3+ consecutive)</li>
+                    <li><code>milestone.reached</code> - User achieved milestone</li>
+                    <li><code>device.locked</code> - Guardian Lock activated</li>
+                    <li><code>streak.broken</code> - Clean streak reset</li>
+                </ul>
+
+                <h4 style="margin-top: 20px;">Webhook Payload Example:</h4>
+                <div class="code-block">
+                    {
+                    "event": "threat.detected",
+                    "timestamp": "2025-11-28T16:50:00Z",
+                    "data": {
+                    "user_id": 5,
+                    "threat_level": 4,
+                    "threat_type": "nsfw_image",
+                    "blocked": true
+                    },
+                    "signature": "sha256=abc123..."
+                    }
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <a href="index.html" class="logo" style="margin-bottom: 20px;"><span>🛡️</span> ANTI-LUST
+                        GUARDIAN</a>
+                    <p style="color: var(--text-muted);">Advanced AI protection for the modern digital frontier.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>DOCS</h4>
+                    <ul>
+                        <li><a href="api-docs.html">API Reference</a></li>
+                        <li><a href="#">Integration Guide</a></li>
+                        <li><a href="#">SDK Downloads</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>SUPPORT</h4>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Community</a></li>
+                        <li><a href="#">Status Page</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>CONTACT</h4>
+                    <ul>
+                        <li><a href="#">Email Support</a></li>
+                        <li><a href="#">GitHub</a></li>
+                        <li><a href="#">Discord</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 ANTI-LUST GUARDIAN // ALL RIGHTS RESERVED ISHRAK ARAF NEO
+            </div>
+        </div>
+    </footer>
+
+    <script src="scripts/main.js"></script>
+</body>
+
+</html>

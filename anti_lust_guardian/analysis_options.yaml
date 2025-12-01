@@ -1,0 +1,12 @@
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Suppress cosmetic warning about private state classes (standard Flutter practice)
+    library_private_types_in_public_api: false
+    
+    # Keep important rules enabled
+    use_build_context_synchronously: true
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_final_fields: true
