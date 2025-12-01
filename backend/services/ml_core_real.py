@@ -1,10 +1,8 @@
 """
-Real ML Core - Using Pre-Trained Models from HuggingFace
+Real ML Core - Using Pre-Trained Models from HuggingFace with TensorFlow
 No fake models, no random weights, 100% real NSFW detection.
 """
 import logging
-import torch
-import torch.nn.functional as F
 import numpy as np
 from typing import Optional, Dict, Tuple, Any
 from PIL import Image
@@ -13,28 +11,27 @@ import io
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("RealMLCore")
 
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-logger.info(f"Real ML Core initialized on device: {DEVICE}")
-
 
 class RealNSFWImageClassifier:
     """
-    Real NSFW image classifier using Falcons/nsfw_image_detection from HuggingFace.
-    This is a pre-trained ResNet model fine-tuned on NSFW datasets.
+    Real NSFW image classifier using AdamCodd/vit-base-nsfw-detector from HuggingFace.
+    Using TensorFlow backend for better deployment compatibility.
     """
     def __init__(self):
         try:
+            import os
+            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow warnings
             from transformers import pipeline
-            logger.info("Loading BEST NSFW image classifier...")
+            logger.info("Loading BEST NSFW image classifier (TensorFlow)...")
             self.classifier = pipeline(
                 "image-classification",
                 model="AdamCodd/vit-base-nsfw-detector",
-                device=0 if DEVICE == 'cuda' else -1
+                framework="tf"
             )
             logger.info("[OK] BEST NSFW Image Classifier loaded (204k downloads)")
         except Exception as e:
             logger.error(f"Failed to load image classifier: {e}")
-            logger.info("Run: pip install transformers pillow")
+            logger.info("Run: pip install tensorflow transformers pillow")
             raise
 
     def predict(self, image_bytes: bytes) -> float:
@@ -63,22 +60,24 @@ class RealNSFWImageClassifier:
 
 class RealTextToxicityClassifier:
     """
-    Real text toxicity classifier using unitary/toxic-bert.
-    Pre-trained on Wikipedia Toxic Comments dataset.
+    Real text toxicity classifier using s-nlp/roberta_toxicity_classifier.
+    Pre-trained on Wikipedia Toxic Comments dataset with TensorFlow backend.
     """
     def __init__(self):
         try:
+            import os
+            os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow warnings
             from transformers import pipeline
-            logger.info("Loading BEST text toxicity classifier...")
+            logger.info("Loading BEST text toxicity classifier (TensorFlow)...")
             self.classifier = pipeline(
                 "text-classification",
                 model="s-nlp/roberta_toxicity_classifier",
-                device=0 if DEVICE == 'cuda' else -1
+                framework="tf"
             )
             logger.info("[OK] BEST Text Toxicity Classifier loaded (74.3k downloads)")
         except Exception as e:
             logger.error(f"Failed to load text classifier: {e}")
-            logger.info("Run: pip install transformers")
+            logger.info("Run: pip install tensorflow transformers")
             raise
     
     def predict(self, text: str) -> float:

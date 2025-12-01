@@ -15,7 +15,7 @@ COPY backend/ /app/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir torch==2.1.0 --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir tensorflow-cpu==2.15.0 && \
     pip install --no-cache-dir transformers && \
     pip install --no-cache-dir -r requirements.txt
 

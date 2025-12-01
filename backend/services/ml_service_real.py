@@ -4,7 +4,6 @@ Real ML Service - Using actual pre-trained models
 import logging
 import asyncio
 import time
-import torch
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
