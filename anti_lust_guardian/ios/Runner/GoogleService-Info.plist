@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>77553493618-2evahsm5sqm7ucvjub9r7pbm5epbb9qu.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.77553493618-2evahsm5sqm7ucvjub9r7pbm5epbb9qu</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBSwaflqlwxnFFO2OZ3LDDrSyKFahSGMX4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>77553493618</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.antilustguardian.app</string>
+	<key>PROJECT_ID</key>
+	<string>anti-lust-guardian</string>
+	<key>STORAGE_BUCKET</key>
+	<string>anti-lust-guardian.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:77553493618:ios:ba340a35fdea6afbbe84eb</string>
+</dict>
+</plist>

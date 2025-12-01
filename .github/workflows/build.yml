@@ -1,0 +1,175 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: |
+          cd anti_lust_guardian
+          flutter pub get
+      
+      - name: Build APK
+        run: |
+          cd anti_lust_guardian
+          flutter build apk --release
+      
+      - name: Build App Bundle
+        run: |
+          cd anti_lust_guardian
+          flutter build appbundle --release
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: anti_lust_guardian/build/app/outputs/flutter-apk/app-release.apk
+      
+      - name: Upload App Bundle
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-aab
+          path: anti_lust_guardian/build/app/outputs/bundle/release/app-release.aab
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: |
+          cd anti_lust_guardian
+          flutter pub get
+      
+      - name: Build Windows
+        run: |
+          cd anti_lust_guardian
+          flutter build windows --release
+      
+      - name: Archive Windows Build
+        run: |
+          cd anti_lust_guardian/build/windows/runner/Release
+          Compress-Archive -Path * -DestinationPath anti-lust-guardian-windows.zip
+      
+      - name: Upload Windows Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: anti_lust_guardian/build/windows/runner/Release/anti-lust-guardian-windows.zip
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: |
+          cd anti_lust_guardian
+          flutter pub get
+      
+      - name: Build Linux
+        run: |
+          cd anti_lust_guardian
+          flutter build linux --release
+      
+      - name: Archive Linux Build
+        run: |
+          cd anti_lust_guardian/build/linux/x64/release/bundle
+          tar -czf anti-lust-guardian-linux.tar.gz *
+      
+      - name: Upload Linux Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: anti_lust_guardian/build/linux/x64/release/bundle/anti-lust-guardian-linux.tar.gz
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.16.0'
+          channel: 'stable'
+      
+      - name: Get dependencies
+        run: |
+          cd anti_lust_guardian
+          flutter pub get
+      
+      - name: Build macOS
+        run: |
+          cd anti_lust_guardian
+          flutter build macos --release
+      
+      - name: Archive macOS Build
+        run: |
+          cd anti_lust_guardian/build/macos/Build/Products/Release
+          zip -r anti-lust-guardian-macos.zip anti_lust_guardian.app
+      
+      - name: Upload macOS Build
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-build
+          path: anti_lust_guardian/build/macos/Build/Products/Release/anti-lust-guardian-macos.zip
+
+  create-release:
+    needs: [build-android, build-windows, build-linux, build-macos]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+      
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            android-apk/app-release.apk
+            android-aab/app-release.aab
+            windows-build/anti-lust-guardian-windows.zip
+            linux-build/anti-lust-guardian-linux.tar.gz
+            macos-build/anti-lust-guardian-macos.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

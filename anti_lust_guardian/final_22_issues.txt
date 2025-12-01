@@ -1,0 +1,44 @@
+﻿Analyzing anti_lust_guardian...                                 
+
+   info - Use 'const' with the constructor to improve performance - lib\screens\auth\role_selection_screen.dart:157:23 - prefer_const_constructors
+   info - Unnecessary 'const' keyword - lib\screens\auth\role_selection_screen.dart:161:27 - unnecessary_const
+   info - Unnecessary 'const' keyword - lib\screens\auth\role_selection_screen.dart:164:27 - unnecessary_const
+   info - Use 'const' with the constructor to improve performance - lib\screens\auth\role_selection_screen.dart:173:23 - prefer_const_constructors
+   info - Unnecessary 'const' keyword - lib\screens\auth\role_selection_screen.dart:177:27 - unnecessary_const
+   info - Unnecessary 'const' keyword - lib\screens\auth\role_selection_screen.dart:180:27 - unnecessary_const
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\role_selection_screen.dart:195:15 - use_build_context_synchronously
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\auth\signup_screen.dart:8:9 - use_key_in_widget_constructors
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\signup_screen.dart:32:11 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\signup_screen.dart:35:11 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\signup_screen.dart:41:9 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\signup_screen.dart:45:9 - use_build_context_synchronously
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\block_page.dart:7:9 - use_key_in_widget_constructors
+   info - Convert 'key' to a super parameter - lib\screens\focus_horizon.dart:5:9 - use_super_parameters
+   info - Convert 'key' to a super parameter - lib\screens\paywall_screen.dart:10:9 - use_super_parameters
+   info - Constructors for public widgets should have a named 'key' parameter - lib\screens\premium_dashboard_screen.dart:11:9 - use_key_in_widget_constructors
+   info - Use 'const' with the constructor to improve performance - lib\ui\consent_modal.dart:75:29 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\ui\education_hub.dart:6:9 - use_key_in_widget_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\ui\holographic_dashboard.dart:9:9 - use_key_in_widget_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\ui\parent_dashboard.dart:8:9 - use_key_in_widget_constructors
+   info - Use 'const' with the constructor to improve performance - lib\ui\parent_dashboard.dart:90:11 - prefer_const_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\ui\privacy_dashboard.dart:7:9 - use_key_in_widget_constructors
+
+flutter : 22 issues 
+found. (ran in 8.9s)
+At line:1 char:1
++ flutter analyze 
+--suppress-analytics 2>&1 
+| Out-File -FilePath 
+"final ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpe    cified: 
+(22 issu    es found. 
+(ran i    n 8.9s):String) 
+    [], RemoteExcept    
+ion
+    + FullyQualified    
+ErrorId : Native    
+CommandError
+ 

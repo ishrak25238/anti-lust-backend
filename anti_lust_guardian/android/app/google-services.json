@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "77553493618",
+    "project_id": "anti-lust-guardian",
+    "storage_bucket": "anti-lust-guardian.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:77553493618:android:118f8b5097157f9abe84eb",
+        "android_client_info": {
+          "package_name": "com.antilustguardian.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "77553493618-5s7kmb6dhn8ne4ooffvsde8eaib9mnvs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnQuTgAMVLVxzuJL_jHX0MtXMOAIhMPiM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "77553493618-5s7kmb6dhn8ne4ooffvsde8eaib9mnvs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
