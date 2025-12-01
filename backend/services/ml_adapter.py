@@ -7,14 +7,24 @@ from typing import Dict, Union
 import base64
 from io import BytesIO
 
-from services.ml_service_real import RealMLService
+# Try to import real ML service, fall back to simple one if torch is not available
+try:
+    from services.ml_service_real import RealMLService
+    ML_AVAILABLE = True
+except (ImportError, ModuleNotFoundError) as e:
+    from services.ml_service_simple import SimpleMLService
+    ML_AVAILABLE = False
+    print(f"ML models not available ({e}), using simple fallback")
 
 
 class MLServiceAdapter:
     """Adapter to maintain backward compatibility while using real ML models."""
     
     def __init__(self):
-        self.real_service = RealMLService()
+        if ML_AVAILABLE:
+            self.real_service = RealMLService()
+        else:
+            self.real_service = SimpleMLService()
         self._loaded = True
     
     def is_loaded(self) -> bool:
