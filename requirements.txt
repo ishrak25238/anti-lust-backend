@@ -1,38 +1,42 @@
+# Core FastAPI and Server
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
-stripe==7.11.0
 python-dotenv==1.0.0
 pydantic==2.5.3
+python-multipart==0.0.6
+
+# Database
 sqlalchemy==2.0.25
-alembic==1.13.1
 aiosqlite==0.19.0
+
+# Payment
+stripe==7.11.0
+
+# Email
 aiosmtplib==3.0.1
 sendgrid==6.11.0
-slowapi==0.1.9
+
+# Security & Auth
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.6
+slowapi==0.1.9
+
+# Monitoring
 prometheus-client==0.19.0
 sentry-sdk[fastapi]==1.39.2
+
+# AI Services (Minimal)
 openai==1.6.1
-tensorflow==2.20.0
-ml-dtypes==0.2.0
 pillow==10.2.0
 numpy==1.26.3
-opencv-python==4.9.0.80
-transformers==4.37.0
-torch==2.1.2
-torchvision==0.16.2
-torchaudio==2.1.2
-scikit-learn==1.4.0
-scipy==1.12.0
-matplotlib==3.8.2
-seaborn==0.13.1
-nudenet>=3.4.2
-reportlab==4.0.8
 requests==2.31.0
 httpx==0.26.0
+
+# ML - Only Essential Ones
+nudenet>=3.4.2
+scikit-learn==1.4.0
+
+# Utils
+reportlab==4.0.8
 twilio==8.10.0
 psutil==5.9.6
-protobuf==5.26.1
-grpcio-status==1.62.0
