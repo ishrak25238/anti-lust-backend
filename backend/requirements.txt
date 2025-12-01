@@ -1,5 +1,5 @@
 # Build System
---extra-index-url https://download.pytorch.org/whl/cpu
+
 wheel
 
 # Core FastAPI and Server
