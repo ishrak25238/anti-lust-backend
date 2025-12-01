@@ -33,8 +33,10 @@ reportlab==4.0.8
 twilio==8.10.0
 psutil==5.9.6
 
-# AI/ML - TensorFlow Backend
+# AI/ML - ONNX + TensorFlow (Best Accuracy)
 openai==1.6.1
 numpy==1.26.3
+onnxruntime==1.16.0
+opencv-python-headless==4.8.1.78
 tensorflow-cpu==2.15.0
 transformers==4.35.0
