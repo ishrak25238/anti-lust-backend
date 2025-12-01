@@ -1,4 +1,5 @@
 # Build System
+--extra-index-url https://download.pytorch.org/whl/cpu
 wheel
 
 # Core FastAPI and Server
@@ -36,6 +37,8 @@ reportlab>=4.0.8
 twilio>=8.10.0
 psutil>=5.9.6
 
-# AI/ML - Lightweight versions only
+# AI/ML
+torch
+transformers
 openai>=1.6.1
 numpy>=1.26.3
