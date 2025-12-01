@@ -1,3 +1,7 @@
+# Build System
+setuptools<70.0.0
+wheel
+
 # Core FastAPI and Server
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
