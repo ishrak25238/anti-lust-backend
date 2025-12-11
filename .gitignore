@@ -60,3 +60,9 @@ htmlcov/
 
 # Node
 node_modules/
+
+# Firebase/Google Service Config (contains API keys)
+**/GoogleService-Info.plist
+**/google-services.json
+firebase-debug.log
+.firebase/
