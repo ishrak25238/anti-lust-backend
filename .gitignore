@@ -29,6 +29,10 @@ models/*.pth
 models/*.safetensors
 *.onnx
 ml_cache/
+*_downloaded.pt
+*.mp4
+*.avi
+*.mov
 
 # Logs
 *.log
