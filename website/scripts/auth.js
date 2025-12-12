@@ -78,13 +78,14 @@ async function signInWithGoogle() {
         }
 
         // No plan - just go to dashboard
-        const redirect = urlParams.get('redirect') || '/dashboard.html';
-        window.location.href = redirect;
+        // No plan - just go to dashboard
+        const redirect = urlParams.get('redirect');
+        safeRedirect(redirect);
 
         return user;
     } catch (error) {
         console.error('❌ Sign in error:', error);
-        alert('Sign in failed: ' + error.message);
+        alert('Sign in failed. Please check your credentials.');
         throw error;
     }
 }
@@ -119,13 +120,13 @@ async function signInWithEmail(email, password) {
             return user;
         }
 
-        const redirect = urlParams.get('redirect') || '/dashboard.html';
-        window.location.href = redirect;
+        const redirect = urlParams.get('redirect');
+        safeRedirect(redirect);
 
         return user;
     } catch (error) {
         console.error('❌ Sign in error:', error);
-        alert('Sign in failed: ' + error.message);
+        alert('Sign in failed. Please check your credentials.');
         throw error;
     }
 }
@@ -135,6 +136,13 @@ async function signInWithEmail(email, password) {
  */
 async function registerWithEmail(email, password) {
     try {
+        // Password Strength Validation (Security Fix)
+        const passwordError = validatePasswordStrength(password);
+        if (passwordError) {
+            alert(passwordError);
+            throw new Error(passwordError);
+        }
+
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const user = result.user;
 
@@ -143,15 +151,38 @@ async function registerWithEmail(email, password) {
         // Create user profile
         await createUserProfile(user);
 
-        const redirect = new URLSearchParams(window.location.search).get('redirect') || '/dashboard.html';
-        window.location.href = redirect;
+        const redirect = new URLSearchParams(window.location.search).get('redirect');
+        safeRedirect(redirect);
 
         return user;
     } catch (error) {
         console.error('❌ Registration error:', error);
-        alert('Registration failed: ' + error.message);
+        alert('Registration failed. Please try again.');
         throw error;
     }
+}
+
+/**
+ * Password Strength Validator
+ * Returns error message if weak, null if strong
+ */
+function validatePasswordStrength(password) {
+    if (password.length < 8) {
+        return 'Password must be at least 8 characters long.';
+    }
+    if (!/[A-Z]/.test(password)) {
+        return 'Password must contain at least one uppercase letter.';
+    }
+    if (!/[a-z]/.test(password)) {
+        return 'Password must contain at least one lowercase letter.';
+    }
+    if (!/[0-9]/.test(password)) {
+        return 'Password must contain at least one number.';
+    }
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        return 'Password must contain at least one special character (!@#$%^&*...).';
+    }
+    return null; // Password is strong
 }
 
 /**
@@ -379,3 +410,52 @@ console.log('✅ Auth module loaded');
 if (window.location.pathname.includes('dashboard')) {
     requireAuth();
 }
+
+/**
+ * Safe Redirect Helper
+ * Prevents Open Redirect Vulnerabilities
+ */
+function safeRedirect(url) {
+    const defaultPath = '/dashboard.html';
+    const target = url || defaultPath;
+
+    // Allowed paths whitelist
+    const allowedPaths = ['/dashboard.html', '/index.html', '/profile.html', '/login.html'];
+
+    // Check if path is in whitelist OR is a relative path (starts with / but not //)
+    if ((allowedPaths.includes(target)) || (target.startsWith('/') && !target.startsWith('//'))) {
+        window.location.href = target;
+    } else {
+        console.warn('Blocked unsafe redirect to:', target);
+        window.location.href = defaultPath;
+    }
+}
+
+/**
+ * Session Timeout Monitor
+ * Signs out user after 30 minutes of inactivity
+ */
+function initSessionTimeout() {
+    let lastActivity = Date.now();
+    const TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+
+    function updateActivity() {
+        lastActivity = Date.now();
+    }
+
+    window.addEventListener('click', updateActivity);
+    window.addEventListener('keypress', updateActivity);
+    window.addEventListener('mousemove', updateActivity);
+    window.addEventListener('touchstart', updateActivity);
+
+    setInterval(() => {
+        if (isAuthenticated() && Date.now() - lastActivity > TIMEOUT_MS) {
+            console.log('Session timed out');
+            signOutUser();
+            alert('Session expired due to inactivity. Please sign in again.');
+        }
+    }, 60000); // Check every minute
+}
+
+// Initialize timeout monitor
+initSessionTimeout();

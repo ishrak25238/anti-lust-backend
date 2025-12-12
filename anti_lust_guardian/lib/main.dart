@@ -21,16 +21,33 @@ import 'screens/paywall_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load environment variables
-  await dotenv.load(fileName: ".env");
+  // Load environment variables (optional - may not exist in some builds)
+  try {
+    await dotenv.load(fileName: ".env");
+    debugPrint('✅ Environment variables loaded');
+  } catch (e) {
+    debugPrint('⚠️ .env file not found or invalid: $e');
+    // Continue without .env - use defaults
+  }
 
   // Initialize Firebase
   await Firebase.initializeApp();
 
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+  // Try to initialize Supabase (optional - app works with Firebase only)
+  try {
+    final supabaseUrl = dotenv.env['SUPABASE_URL'];
+    final supabaseKey = dotenv.env['SUPABASE_ANON_KEY'];
+    if (supabaseUrl != null && supabaseKey != null && supabaseUrl.isNotEmpty && supabaseKey.isNotEmpty) {
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseKey,
+      );
+      debugPrint('✅ Supabase initialized');
+    }
+  } catch (e) {
+    debugPrint('⚠️ Supabase initialization failed (optional): $e');
+    // Continue without Supabase - Firebase is the main backend
+  }
 
   final securityService = SecurityService();
   final parentalLinkService = ParentalLinkService();

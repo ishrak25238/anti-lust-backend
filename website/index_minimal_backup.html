@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANTI-LUST GUARDIAN | Neural Defense System</title>
+    <meta name="description" content="AI-Powered Neural Defense System. Protect your digital consciousness.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+    <style>
+        :root {
+            --bg-dark: #0a0c10;
+            --bg-mid: #12151c;
+            --surface: rgba(18, 21, 28, 0.9);
+            --teal: #1a9c9c;
+            --teal-glow: rgba(26, 156, 156, 0.15);
+            --orange: #d4622a;
+            --orange-glow: rgba(212, 98, 42, 0.12);
+            --amber: #c49a3a;
+            --text-primary: #e8eaed;
+            --text-secondary: #8b9098;
+            --text-dim: #4a4f58;
+            --border: rgba(255, 255, 255, 0.06);
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Cinematic Background */
+        .cinematic-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(180deg, #080a0f 0%, #0d1018 30%, #111620 60%, #0a0d12 100%);
+        }
+
+        /* Film Grain */
+        .film-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.035;
+            pointer-events: none;
+            z-index: 1;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+        }
+
+        /* Atmospheric Fog */
+        .atmosphere {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(0deg, rgba(18, 22, 32, 0.95) 0%, rgba(13, 16, 24, 0.6) 30%, transparent 100%);
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Photorealistic City Silhouette */
+        .city-layer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 45%;
+            z-index: 3;
+            opacity: 0.85;
+        }
+
+        .city-layer svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Distant Light Sources */
+        .light-source {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        .light-1 {
+            top: 20%;
+            left: 10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--teal-glow) 0%, transparent 70%);
+        }
+
+        .light-2 {
+            top: 30%;
+            right: 15%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, var(--orange-glow) 0%, transparent 70%);
+        }
+
+        .light-3 {
+            bottom: 20%;
+            left: 40%;
+            width: 500px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(196, 154, 58, 0.08) 0%, transparent 70%);
+        }
+
+        /* Realistic Rain */
+        .rain-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4;
+            overflow: hidden;
+        }
+
+        .rain-drop {
+            position: absolute;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(180, 200, 220, 0.25), rgba(180, 200, 220, 0.08));
+            animation: rain-fall linear infinite;
+        }
+
+        @keyframes rain-fall {
+            0% {
+                transform: translateY(-100vh);
+            }
+
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+
+        /* Content */
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 0;
+            background: rgba(10, 12, 16, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .logo span {
+            color: var(--teal);
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+        }
+
+        nav a {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 12px 26px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-ghost {
+            background: rgba(18, 21, 28, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-secondary);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--teal);
+            color: var(--teal);
+            background: rgba(26, 156, 156, 0.1);
+            box-shadow: inset 0 0 20px rgba(26, 156, 156, 0.1), 0 0 20px var(--teal-glow), 0 0 40px var(--teal-glow);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.5) 0%, rgba(26, 156, 156, 0.3) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--teal);
+            color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 0 20px rgba(26, 156, 156, 0.2), 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 15px var(--teal-glow);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.7) 0%, rgba(26, 156, 156, 0.5) 100%);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), inset 0 0 30px rgba(26, 156, 156, 0.3), 0 4px 25px rgba(0, 0, 0, 0.4), 0 0 30px var(--teal-glow), 0 0 60px var(--teal-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(90deg, var(--teal), var(--orange), var(--teal));
+            background-size: 200% 100%;
+            border-radius: 10px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .btn-primary:hover::before {
+            opacity: 0.5;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 140px 40px 80px;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            padding: 8px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--teal);
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--teal);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        .hero h1 {
+            font-size: 56px;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--teal) 0%, var(--amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-large {
+            padding: 14px 32px;
+            font-size: 13px;
+        }
+
+        /* Video Hero Section */
+        .video-hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video-hero video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg,
+                    rgba(10, 12, 16, 0.7) 0%,
+                    rgba(10, 12, 16, 0.3) 40%,
+                    rgba(10, 12, 16, 0.5) 70%,
+                    rgba(10, 12, 16, 0.9) 100%);
+            z-index: 1;
+        }
+
+        .video-hero .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Futuristic Connected Buttons from Video */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0;
+            margin-top: 40px;
+        }
+
+        .btn-futuristic {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 500;
+            padding: 16px 36px;
+            cursor: pointer;
+            text-decoration: none;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(10, 12, 16, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            color: var(--text-secondary);
+            border: 1px solid rgba(26, 156, 156, 0.3);
+        }
+
+        .btn-futuristic:first-child {
+            border-radius: 12px 0 0 12px;
+            border-right: none;
+        }
+
+        .btn-futuristic:last-child {
+            border-radius: 0 12px 12px 0;
+            border-left: 1px solid rgba(26, 156, 156, 0.15);
+        }
+
+        .btn-futuristic:only-child {
+            border-radius: 12px;
+            border: 1px solid rgba(26, 156, 156, 0.3);
+        }
+
+        .btn-futuristic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.1) 0%, transparent 50%, rgba(212, 98, 42, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            border-radius: inherit;
+        }
+
+        .btn-futuristic:hover::before {
+            opacity: 1;
+        }
+
+        .btn-futuristic:hover {
+            color: var(--teal);
+            border-color: var(--teal);
+            box-shadow:
+                0 0 30px rgba(26, 156, 156, 0.3),
+                0 0 60px rgba(26, 156, 156, 0.15),
+                inset 0 0 30px rgba(26, 156, 156, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn-futuristic.primary {
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.4) 0%, rgba(26, 156, 156, 0.2) 100%);
+            color: #fff;
+            border-color: var(--teal);
+            box-shadow:
+                0 0 20px rgba(26, 156, 156, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-futuristic.primary:hover {
+            background: linear-gradient(135deg, rgba(26, 156, 156, 0.6) 0%, rgba(26, 156, 156, 0.4) 100%);
+            box-shadow:
+                0 0 40px rgba(26, 156, 156, 0.4),
+                0 0 80px rgba(26, 156, 156, 0.2),
+                inset 0 0 40px rgba(26, 156, 156, 0.15);
+        }
+
+        /* Glow line connecting buttons */
+        .button-group::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1px;
+            height: 60%;
+            background: linear-gradient(180deg, transparent, var(--teal), transparent);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 32px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Features */
+        .features {
+            padding: 100px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--teal);
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: rgba(26, 156, 156, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--teal-glow);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Pricing */
+        .pricing {
+            padding: 100px 40px;
+            background: var(--bg-mid);
+        }
+
+        .pricing-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .price-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 36px;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .price-card.featured {
+            border-color: var(--teal);
+        }
+
+        .price-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            padding: 6px 16px;
+            background: var(--teal);
+            color: #fff;
+            border-radius: 20px;
+            letter-spacing: 1px;
+        }
+
+        .price-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .price-amount {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .price-amount span {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--text-dim);
+        }
+
+        .price-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .price-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .price-features li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .price-features li::before {
+            content: '✓';
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .price-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 13px;
+            border-radius: 10px !important;
+            margin-top: 8px;
+        }
+
+        /* Download Section */
+        .download-section {
+            padding: 100px 40px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-dark) 100%);
+        }
+
+        /* Footer */
+        footer {
+            padding: 60px 40px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 40px;
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-brand p {
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        .footer-links h4 {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .footer-links a {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 6px 0;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border);
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        /* Auth Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-mid);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .modal-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--teal);
+        }
+
+        .form-submit {
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .form-divider {
+            text-align: center;
+            margin: 24px 0;
+            color: var(--text-dim);
+            font-size: 13px;
+            position: relative;
+        }
+
+        .form-divider::before,
+        .form-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .form-divider::before {
+            left: 0;
+        }
+
+        .form-divider::after {
+            right: 0;
+        }
+
+        .btn-google {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #fff;
+            color: #333;
+            border: none;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .form-footer a {
+            color: var(--teal);
+            text-decoration: none;
+        }
+
+        .password-requirements {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--teal-glow);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: var(--teal);
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: var(--text-secondary);
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        #authButtons,
+        #userMenu {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 30px;
+            }
+
+            .footer-inner {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cinematic-bg"></div>
+    <div class="film-grain"></div>
+    <div class="light-source light-1"></div>
+    <div class="light-source light-2"></div>
+    <div class="light-source light-3"></div>
+    <div class="atmosphere"></div>
+    <div class="city-layer">
+        <svg viewBox="0 0 1920 400" preserveAspectRatio="xMidYMax slice">
+            <defs>
+                <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#1a1e28" />
+                    <stop offset="100%" style="stop-color:#0a0c10" />
+                </linearGradient>
+                <linearGradient id="windowGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#c49a3a;stop-opacity:0.6" />
+                    <stop offset="100%" style="stop-color:#d4622a;stop-opacity:0.3" />
+                </linearGradient>
+            </defs>
+            <rect x="50" y="120" width="80" height="280" fill="url(#buildingGrad)" />
+            <rect x="55" y="130" width="8" height="12" fill="url(#windowGlow)" opacity="0.7" />
+            <rect x="70" y="130" width="8" height="12" fill="url(#windowGlow)" opacity="0.4" />
+            <rect x="55" y="155" width="8" height="12" fill="url(#windowGlow)" opacity="0.5" />
+            <rect x="85" y="180" width="8" height="12" fill="url(#windowGlow)" opacity="0.8" />
+            <rect x="160" y="80" width="100" height="320" fill="url(#buildingGrad)" />
+            <rect x="165" y="90" width="10" height="14" fill="url(#windowGlow)" opacity="0.6" />
+            <rect x="190" y="90" width="10" height="14" fill="url(#windowGlow)" opacity="0.3" />
+            <rect x="215" y="120" width="10" height="14" fill="url(#windowGlow)" opacity="0.9" />
+            <rect x="300" y="150" width="60" height="250" fill="url(#buildingGrad)" />
+            <rect x="400" y="60" width="120" height="340" fill="url(#buildingGrad)" />
+            <rect x="410" y="75" width="12" height="16" fill="url(#windowGlow)" opacity="0.7" />
+            <rect x="440" y="100" width="12" height="16" fill="url(#windowGlow)" opacity="0.5" />
+            <rect x="480" y="75" width="12" height="16" fill="url(#windowGlow)" opacity="0.4" />
+            <rect x="560" y="100" width="90" height="300" fill="url(#buildingGrad)" />
+            <rect x="690" y="40" width="150" height="360" fill="url(#buildingGrad)" />
+            <rect x="700" y="55" width="14" height="18" fill="url(#windowGlow)" opacity="0.8" />
+            <rect x="750" y="80" width="14" height="18" fill="url(#windowGlow)" opacity="0.6" />
+            <rect x="800" y="55" width="14" height="18" fill="url(#windowGlow)" opacity="0.4" />
+            <rect x="880" y="130" width="70" height="270" fill="url(#buildingGrad)" />
+            <rect x="990" y="70" width="100" height="330" fill="url(#buildingGrad)" />
+            <rect x="1000" y="85" width="12" height="15" fill="url(#windowGlow)" opacity="0.7" />
+            <rect x="1130" y="110" width="80" height="290" fill="url(#buildingGrad)" />
+            <rect x="1250" y="50" width="130" height="350" fill="url(#buildingGrad)" />
+            <rect x="1260" y="65" width="14" height="18" fill="url(#windowGlow)" opacity="0.9" />
+            <rect x="1300" y="90" width="14" height="18" fill="url(#windowGlow)" opacity="0.5" />
+            <rect x="1340" y="65" width="14" height="18" fill="url(#windowGlow)" opacity="0.6" />
+            <rect x="1420" y="95" width="90" height="305" fill="url(#buildingGrad)" />
+            <rect x="1550" y="140" width="70" height="260" fill="url(#buildingGrad)" />
+            <rect x="1660" y="80" width="110" height="320" fill="url(#buildingGrad)" />
+            <rect x="1670" y="95" width="12" height="15" fill="url(#windowGlow)" opacity="0.7" />
+            <rect x="1720" y="120" width="12" height="15" fill="url(#windowGlow)" opacity="0.5" />
+            <rect x="1810" y="160" width="80" height="240" fill="url(#buildingGrad)" />
+        </svg>
+    </div>
+    <div class="rain-container" id="rainContainer"></div>
+    <div class="content">
+        <header>
+            <div class="header-inner">
+                <a href="#" class="logo">ANTI<span>LUST</span></a>
+                <nav>
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#download">Download</a>
+                    <a href="#support">Support</a>
+                </nav>
+                <div class="nav-buttons">
+                    <div id="authButtons">
+                        <button class="btn btn-ghost" onclick="showModal('login')">Sign In</button>
+                        <button class="btn btn-primary" onclick="showModal('register')">Get Started</button>
+                    </div>
+                    <div id="userMenu" class="user-menu">
+                        <div class="user-avatar">👤</div>
+                        <span class="user-email" id="userEmail"></span>
+                        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <section class="video-hero">
+            <video autoplay muted loop playsinline>
+                <source src="hero-video.mp4" type="video/mp4">
+            </video>
+            <div class="video-overlay"></div>
+            <div class="hero-content">
+                <div class="badge">
+                    <span class="badge-dot"></span>
+                    NEURAL DEFENSE ACTIVE
+                </div>
+                <h1>Protect Your Mind.<br><em>Reclaim Control.</em></h1>
+                <p>AI-powered protection that works silently in the background. Advanced neural networks detect and
+                    block harmful content before it reaches you.</p>
+                <div class="button-group">
+                    <a href="#download" class="btn-futuristic primary">Download App</a>
+                    <a href="#features" class="btn-futuristic">Learn More</a>
+                </div>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value" id="threatCount">847,293</div>
+                        <div class="stat-label">Threats Blocked</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value" id="userCount">14,892</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">99.7%</div>
+                        <div class="stat-label">Detection Rate</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="features" id="features">
+            <div class="section-header">
+                <div class="section-tag">CAPABILITIES</div>
+                <h2 class="section-title">Advanced Protection Features</h2>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Neural Detection</h3>
+                    <p>Machine learning models trained on millions of samples provide industry-leading accuracy in
+                        content detection.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-Time Scanning</h3>
+                    <p>Continuous background monitoring with minimal battery impact. Protection that never sleeps.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Privacy First</h3>
+                    <p>All processing happens locally on your device. Your data never leaves your control.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Insight Dashboard</h3>
+                    <p>Track your progress with detailed analytics. Understand patterns and celebrate milestones.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍👩‍👧</div>
+                    <h3>Family Controls</h3>
+                    <p>Parent-child device linking with customizable restrictions and activity monitoring.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Stealth Mode</h3>
+                    <p>Discrete operation with tamper protection. Works silently without interrupting your workflow.</p>
+                </div>
+            </div>
+        </section>
+        <section class="pricing" id="pricing">
+            <div class="pricing-inner">
+                <div class="section-header">
+                    <div class="section-tag">PRICING</div>
+                    <h2 class="section-title">Choose Your Plan</h2>
+                </div>
+                <div class="pricing-grid">
+                    <div class="price-card">
+                        <div class="price-name">Monthly</div>
+                        <div class="price-amount">$4.99<span>/mo</span></div>
+                        <div class="price-desc">Perfect for trying out the service</div>
+                        <ul class="price-features">
+                            <li>Full neural detection</li>
+                            <li>Real-time protection</li>
+                            <li>Basic analytics</li>
+                            <li>Email support</li>
+                        </ul>
+                        <button class="btn-futuristic price-btn" onclick="selectPlan('monthly')">Get Started</button>
+                    </div>
+                    <div class="price-card featured">
+                        <div class="price-name">Annual</div>
+                        <div class="price-amount">$49.99<span>/yr</span></div>
+                        <div class="price-desc">Save 17% with annual billing</div>
+                        <ul class="price-features">
+                            <li>Everything in Monthly</li>
+                            <li>Advanced analytics</li>
+                            <li>Family controls (3 devices)</li>
+                            <li>Priority support</li>
+                        </ul>
+                        <button class="btn-futuristic primary price-btn" onclick="selectPlan('annual')">Get
+                            Started</button>
+                    </div>
+                    <div class="price-card">
+                        <div class="price-name">Lifetime</div>
+                        <div class="price-amount">$149.99</div>
+                        <div class="price-desc">One-time payment, forever access</div>
+                        <ul class="price-features">
+                            <li>Everything in Annual</li>
+                            <li>Unlimited devices</li>
+                            <li>Early access to features</li>
+                            <li>Dedicated support</li>
+                        </ul>
+                        <button class="btn-futuristic price-btn" onclick="selectPlan('lifetime')">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="download-section" id="download">
+            <div class="section-header">
+                <div class="section-tag">DOWNLOAD</div>
+                <h2 class="section-title">Get Started Today</h2>
+                <p
+                    style="color: var(--text-secondary); margin-top: 16px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                    Download the app and take the first step towards a healthier digital life.</p>
+            </div>
+            <div class="button-group" style="margin-top: 40px;">
+                <a href="#" class="btn-futuristic primary">Android APK</a>
+                <a href="#" class="btn-futuristic">iOS App</a>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-inner">
+                <div class="footer-brand">
+                    <a href="#" class="logo">ANTI<span>LUST</span></a>
+                    <p>AI-powered protection for a healthier digital life. Take back control of your mind.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>PRODUCT</h4>
+                    <a href="#features">Features</a>
+                    <a href="#pricing">Pricing</a>
+                    <a href="#download">Download</a>
+                </div>
+                <div class="footer-links">
+                    <h4>SUPPORT</h4>
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact</a>
+                    <a href="#">FAQ</a>
+                </div>
+                <div class="footer-links">
+                    <h4>LEGAL</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+            <div class="footer-bottom">© 2024 Anti-Lust Guardian. All rights reserved.</div>
+        </footer>
+    </div>
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="loginForm">
+                <h2>Welcome back</h2>
+                <p class="modal-subtitle">Sign in to your account</p>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••">
+                </div>
+                <button class="btn btn-primary form-submit" onclick="login()">Sign In</button>
+                <div class="form-divider">or</div>
+                <button class="btn btn-google" onclick="googleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Continue with Google
+                </button>
+                <p class="form-footer">Don't have an account? <a href="#" onclick="switchForm('register')">Sign up</a>
+                </p>
+            </div>
+            <div id="registerForm" style="display:none;">
+                <h2>Create account</h2>
+                <p class="modal-subtitle">Start your protection today</p>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="registerEmail" placeholder="you@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="registerPassword" placeholder="••••••••">
+                    <p class="password-requirements">Min 8 chars, uppercase, lowercase, number, special char</p>
+                </div>
+                <button class="btn btn-primary form-submit" onclick="register()">Create Account</button>
+                <div class="form-divider">or</div>
+                <button class="btn btn-google" onclick="googleSignIn()">
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Continue with Google
+                </button>
+                <p class="form-footer">Already have an account? <a href="#" onclick="switchForm('login')">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Rain effect
+        const rainContainer = document.getElementById('rainContainer');
+        for (let i = 0; i < 100; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'rain-drop';
+            drop.style.left = Math.random() * 100 + '%';
+            drop.style.height = (15 + Math.random() * 25) + 'px';
+            drop.style.animationDuration = (0.5 + Math.random() * 0.5) + 's';
+            drop.style.animationDelay = Math.random() * 2 + 's';
+            drop.style.opacity = 0.1 + Math.random() * 0.2;
+            rainContainer.appendChild(drop);
+        }
+        // Firebase config - REPLACE WITH YOUR VALUES
+        const firebaseConfig = {
+            apiKey: "YOUR-API-KEY",
+            authDomain: "YOUR-PROJECT.firebaseapp.com",
+            projectId: "YOUR-PROJECT-ID",
+            storageBucket: "YOUR-PROJECT.appspot.com",
+            messagingSenderId: "YOUR-SENDER-ID",
+            appId: "YOUR-APP-ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        // Auth state observer
+        auth.onAuthStateChanged(user => {
+            const authButtons = document.getElementById('authButtons');
+            const userMenu = document.getElementById('userMenu');
+            const userEmail = document.getElementById('userEmail');
+            if (user) {
+                authButtons.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userEmail.textContent = user.email;
+            } else {
+                authButtons.style.display = 'flex';
+                userMenu.style.display = 'none';
+            }
+        });
+        function showModal(type) {
+            document.getElementById('authModal').classList.add('active');
+            switchForm(type);
+        }
+        function closeModal() { document.getElementById('authModal').classList.remove('active'); }
+        function switchForm(type) {
+            document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+        }
+        function validatePassword(password) {
+            const minLength = password.length >= 8;
+            const hasUpper = /[A-Z]/.test(password);
+            const hasLower = /[a-z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            return minLength && hasUpper && hasLower && hasNumber && hasSpecial;
+        }
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                closeModal();
+            } catch (error) { alert('Login failed: ' + error.message); }
+        }
+        async function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            if (!validatePassword(password)) {
+                alert('Password must be at least 8 characters with uppercase, lowercase, number, and special character.');
+                return;
+            }
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                closeModal();
+            } catch (error) { alert('Registration failed: ' + error.message); }
+        }
+        async function googleSignIn() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            try {
+                await auth.signInWithPopup(provider);
+                closeModal();
+            } catch (error) { alert('Google sign-in failed: ' + error.message); }
+        }
+        function logout() { auth.signOut(); }
+        function selectPlan(plan) {
+            if (!auth.currentUser) { showModal('register'); return; }
+            const links = {
+                monthly: 'https://buy.stripe.com/YOUR_MONTHLY_LINK',
+                annual: 'https://buy.stripe.com/YOUR_ANNUAL_LINK',
+                lifetime: 'https://buy.stripe.com/YOUR_LIFETIME_LINK'
+            };
+            window.open(links[plan], '_blank');
+        }
+        // Animate counters
+        function animateCounter(el, target) {
+            let current = 0;
+            const increment = target / 60;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) { current = target; clearInterval(timer); }
+                el.textContent = Math.floor(current).toLocaleString();
+            }, 30);
+        }
+        setTimeout(() => {
+            animateCounter(document.getElementById('threatCount'), 847293);
+            animateCounter(document.getElementById('userCount'), 14892);
+        }, 500);
+    </script>
+</body>
+
+</html>

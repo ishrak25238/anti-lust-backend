@@ -1,0 +1,45 @@
+# ============================================
+# QUICK FIX GUIDE
+# ============================================
+
+# PROBLEM 1: Using SendGrid instead of SMTP
+# SOLUTION: Comment out or remove SENDGRID_API_KEY from .env
+
+# Open your .env file and find this line:
+# SENDGRID_API_KEY=SG.xxxxx
+
+# Change it to (add # at the beginning):
+# SENDGRID_API_KEY=
+
+# Or just delete the line completely
+
+# ============================================
+# COMPLETE .ENV FILE (Use this)
+# ============================================
+
+# ML API KEYS
+ML_API_KEYS=alg-app-mobile-2024-98f7d6c5b4a3,alg-app-web-2024-87e6d5c4b3a2
+
+# GMAIL SMTP
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=ishrakarafneo@gmail.com
+SMTP_PASSWORD=your_16_char_app_password_here
+
+EMAIL_SENDER=ishrakarafneo@gmail.com
+PARENT_ALERT_EMAIL=ishrakarafneo@gmail.com
+
+# IMPORTANT: Leave SendGrid EMPTY or comment it out!
+# SENDGRID_API_KEY=
+
+# JWT
+JWT_SECRET_KEY=AntiLustGuardian2024SecretKey
+
+# FIREBASE
+FIREBASE_PROJECT_ID=anti-lust-guardian
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour_key\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk@anti-lust-guardian.iam.gserviceaccount.com
+
+# STRIPE  
+STRIPE_SECRET_KEY=sk_live_or_test_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx

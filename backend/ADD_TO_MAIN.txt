@@ -1,0 +1,77 @@
+# Add these lines after line 536 in main.py (after the first health_check function)
+
+# ============================================================
+# ML API ENDPOINTS (for integration tests & app)
+# ============================================================
+
+@app.get("/api/ml/health")
+async def ml_health_check():
+    """ML service health check"""
+    try:
+        health = ml_service.get_health()
+        return {
+            "status": "operational" if health.get('loaded') else "degraded",
+            "models": health.get('models', {}),
+            "loaded": health.get('loaded', False)
+        }
+    except Exception as e:
+        logger.error(f"ML health check failed: {e}")
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+from fastapi import File, UploadFile
+
+@app.post("/api/ml/scan-image")
+async def scan_image_endpoint(image: UploadFile = File(...)):
+    """Scan uploaded image for NSFW content"""
+    try:
+        image_bytes = await image.read()
+        result = await ml_service.scan_image(image_bytes)
+        
+        return {
+            "is_safe": result.is_safe,
+            "score": result.score,
+            "flags": result.flags,
+            "latency_ms": result.latency_ms
+        }
+    except Exception as e:
+        logger.error(f"Image scan failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class SimplifiedTextScanRequest(BaseModel):
+    text: str
+
+@app.post("/api/ml/scan-text")
+async def scan_text_endpoint(request: SimplifiedTextScanRequest):
+    """Scan text for toxic/harmful content"""
+    try:
+        result = await ml_service.scan_text(request.text)
+        
+        return {
+            "is_safe": result.is_safe,
+            "score": result.score,
+            "flags": result.flags
+        }
+    except Exception as e:
+        logger.error(f"Text scan failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+class SimplifiedURLScanRequest(BaseModel):
+    url: str
+
+@app.post("/api/ml/scan-url")
+async def scan_url_endpoint(request: SimplifiedURLScanRequest):
+    """Scan URL for threats"""
+    try:
+        result = await ml_service.scan_url(request.url)
+        
+        return {
+            "is_safe": result.is_safe,
+            "score": result.score,
+            "flags": result.flags
+        }
+    except Exception as e:
+        logger.error(f"URL scan failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

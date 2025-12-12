@@ -12,16 +12,55 @@ const api = {
     },
 
     async post(endpoint, data) {
+        // CSRF Protection
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
         try {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (csrfToken) {
+                headers['X-CSRF-Token'] = csrfToken;
+            }
+
             const response = await fetch(`${API_URL}${endpoint}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
+                credentials: 'include', // Send cookies
                 body: JSON.stringify(data)
             });
             return await response.json();
         } catch (error) {
             console.error('API POST Error:', error);
             return null;
+        }
+    },
+
+    // Security Utilities
+    utils: {
+        sanitize(input) {
+            if (typeof input !== 'string') return input;
+            return input.replace(/[<>\"'&]/g, '');
+        },
+        escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return unsafe;
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        },
+        rateLimiter: {
+            calls: {},
+            isAllowed(key, maxCalls = 3, windowMs = 60000) {
+                const now = Date.now();
+                if (!this.calls[key]) this.calls[key] = [];
+                this.calls[key] = this.calls[key].filter(time => now - time < windowMs);
+                if (this.calls[key].length >= maxCalls) return false;
+                this.calls[key].push(now);
+                return true;
+            }
         }
     },
 

@@ -4,7 +4,7 @@
 // ============================================
 
 // 🔑 YOUR STRIPE PUBLISHABLE KEY (LIVE MODE)
-const STRIPE_PUBLISHABLE_KEY = 'pk_live_51SYnV2Ad7fQadcPJaPUgRQB9VibztUYclFwaqbHyh0tRvJ7CZtjqmKcjrFpHwITkVrir37405e8ojpl1iLiHeAJN00EdyoYywJ';
+const STRIPE_PUBLISHABLE_KEY = 'pk_live_51SYnV2Ad7fQadcPJE44b9Q9T5tGVQvn0L95GJsc6GtVihBQy8KwWHtRMNRUyS6kSLkgxU2koyV9zZ2HWYp7FC76K00yQiuMG8T';
 
 // Initialize Stripe
 let stripe;
