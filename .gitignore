@@ -33,6 +33,7 @@ ml_cache/
 *.mp4
 *.avi
 *.mov
+*.apk
 
 # Logs
 *.log
